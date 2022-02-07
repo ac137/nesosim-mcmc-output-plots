@@ -28,9 +28,12 @@ nesosim_data['day'] = days
 nesosim_uncertainty['day'] = days
 
 # select corresponding month & calculate monthly mean
+print(nesosim_data)
 
-nesosim_data_monthly = nesosim_data.sel(day="2019-03").mean(axis=0)
-nesosim_uncert_monthly = nesosim_uncertainty.sel(day="2019-03").mean(axis=0)
+print(nesosim_data.sel(day='2019-03'))
+
+nesosim_data_monthly = nesosim_data.sel(day="2019-03")
+nesosim_uncert_monthly = nesosim_uncertainty.sel(day="2019-03")
 
 
 # make sure latitude and longitude are lined up!!!
@@ -40,19 +43,19 @@ r_w =  1024 #kg/m^3
 # density of ice
 r_i = 915 #kg/m^3 (as assumed in Petty et al 2020)
 # density of snow
-r_s = nesosim_data_monthly['snow_density'].values
+r_s = nesosim_data_monthly['snow_density'].mean(axis=0).values
 # snow density comes fron nesosim
 
 # freeboard error
 e_h_f = is2_data['freeboard uncertainty'].values[0,:,:]
 # snow depth error
-e_h_s = nesosim_uncert_monthly['snow_depth'].values
+e_h_s = nesosim_uncert_monthly['snow_depth'].mean(axis=0).values
 # snow density error
-e_r_s = nesosim_uncert_monthly['snow_density'].values
+e_r_s = nesosim_uncert_monthly['snow_density'].mean(axis=0).values
 # ice density error
 e_r_i = 10 #kg/m^3 based on Alexandrov et al. (2013)
 # snow depth
-h_s = nesosim_data_monthly['snow_depth'].values
+h_s = nesosim_data_monthly['snow_depth'].mean(axis=0).values
 # freeboard height
 h_f = is2_data['freeboard'].values[0,:,:]
 #
@@ -66,11 +69,12 @@ sea_ice_thickness = h_f*r_w*inverse_r_w_minus_r_i + h_s*(r_s-r_w)*inverse_r_w_mi
 
 random_uncert = inverse_r_w_minus_r_i*r_w*e_h_f**2 + (e_h_s*inverse_r_w_minus_r_i*(r_s-r_w))**2 + (e_r_s*h_s*inverse_r_w_minus_r_i)**2 + ((h_f*r_w + h_s*r_s - h_s*r_w)*e_r_i*inverse_r_w_minus_r_i**2)**2
 
-
-plt.imshow(sea_ice_thickness)
+plt.figure()
+plt.imshow(sea_ice_thickness,origin='lower',vmin=0,vmax=5)
 plt.colorbar()
 plt.savefig('sea_ice_thickness_estimate.png')
 
-plt.imshow(random_uncert)
+plt.figure()
+plt.imshow(random_uncert,origin='lower',vmin=0,vmax=0.2)
 plt.colorbar()
 plt.savefig('sea_ice_thickness_uncert.png')
