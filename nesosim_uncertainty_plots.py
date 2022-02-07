@@ -145,7 +145,7 @@ im = ax2.imshow(reg_m_2,origin='lower')
 ax2.set_title('1-year mean uncertainty')
 fig.colorbar(im, ax=ax2)
 # plt.show()
-plt.show('annual_mean_depth_maps.png')
+plt.savefig('annual_mean_depth_maps.png')
 
 
 # time series of snow density by layer
