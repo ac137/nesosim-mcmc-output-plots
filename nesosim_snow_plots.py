@@ -20,14 +20,18 @@ import cartopy.crs as ccrs
 # make these file paths easier to change later
 
 
-# file 1  
+# for oib detailed
 file_path_1 = '/users/jk/18/acabaj/NESOSIM/output/100km/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF1.0424574017128326e-06_WPT5_LLF5.32239712044108e-07-100kmv113par_oib_detailed_ic/final/NESOSIMv11_01092010-30042011.nc'
-# file 2
-# file_path_2 = '/users/jk/19/acabaj/nesosim_uncert_output_oib_averagedfinal_5k_2018_2019_cov/averagedfinal_5k_2018_2019_covuncert_100_iter_final.nc'
 
-# print('file paths')
 
 budget_path_1 = '/users/jk/18/acabaj/NESOSIM/output/100km/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF1.0424574017128326e-06_WPT5_LLF5.32239712044108e-07-100kmv113par_oib_detailed_ic/budgets/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF1.0424574017128326e-06_WPT5_LLF5.32239712044108e-07-100kmv113par_oib_detailed_ic-01092010-30042011.nc'
+
+# for oib averaged:
+
+file_path_1 = '/users/jk/18/acabaj/NESOSIM/output/100km/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF5.77125249688052e-07_WPT5_LLF3.500788217903482e-07-100kmv113par_oib_averaged_ic/final/NESOSIMv11_01092010-30042011.nc'
+budget_path_1 = '/users/jk/18/acabaj/NESOSIM/output/100km/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF5.77125249688052e-07_WPT5_LLF3.500788217903482e-07-100kmv113par_oib_averaged_ic/budgets/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF5.77125249688052e-07_WPT5_LLF3.500788217903482e-07-100kmv113par_oib_averaged_ic-01092010-30042011.nc'
+# BE SURE TO CHANGE FILE SAVE PATH (todo: throw in an if statement?)
+
 
 # budget_path_2 = ''
 #TODO: more descriptive variable names here
@@ -82,7 +86,9 @@ ax2.set_ylabel('Snow density (kg/m^3)',color='C1')
 ax2.plot(x_d,dens_1[1:],color='C1')
 ax2.set_ylim(200,350)
 
-plt.savefig('time_series_ic_detailed.png')
+
+# be sure to change file name here
+plt.savefig('time_series_ic_averaged.png')
 
 # plt.show()
 
