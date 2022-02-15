@@ -7,10 +7,14 @@ import xarray as xr
 # icesat-2 data
 is2_data = xr.open_dataset('gridded_freeboard_2019-03.nc')
 
+OIB_STATUS = 'averaged'
+EXTRA_FMT = 'final_5k_2018_2019_cov'
+
+
 # open all the ensembe members and concatenate into a big dataset
 nesosim_data = xr.open_mfdataset('/users/jk/19/acabaj/nesosim_uncert_output_oib_{}{}/100km/ERA*/final/*.nc'.format(OIB_STATUS,EXTRA_FMT),combine='nested',concat_dim='iteration_number')
 
-print(model_data)
+print(nesosim_data)
 
 # dimensions should be (iteration number, day, x, y)
 
@@ -18,6 +22,8 @@ print(model_data)
 days = pd.to_datetime(nesosim_data['day'].values,format='%Y%m%d')
 
 nesosim_data['day'] = days
+
+print(nesosim_data)
 
 # select single month
 nesosim_data_monthly = nesosim_data.sel(day="2019-03")
@@ -37,6 +43,7 @@ r_s = nesosim_data_monthly['snow_density'].mean(axis=1)#.values
 print('monthly mean snow density')
 print(r_s)
 
+# looks like we get the right shape now!
 # # # freeboard error
 # # e_h_f = is2_data['freeboard uncertainty'].values[0,:,:]
 
