@@ -76,7 +76,31 @@ print(sea_ice_uncert)
 print(sea_ice_uncert.shape) #should be 90x90 if all goes well...
 
 
-plt.figure()
-plt.imshow(sea_ice_uncert,origin='lower',vmin=0,vmax=0.2)
-plt.colorbar()
+# plt.figure()
+# plt.imshow(sea_ice_uncert,origin='lower',vmin=0,vmax=0.2)
+# plt.colorbar()
+# plt.savefig('sea_ice_thickness_uncert_estimate_{}.png'.format(DATA_FLAG))
+
+
+
+proj=ccrs.NorthPolarStereo(central_longitude=-45)
+proj_coord = ccrs.PlateCarree()
+
+print('snow depth (m, end of season)')
+
+lons = nesosim_data['longitude']
+lats = nesosim_data['latitude']
+
+var = sea_ice_uncert
+fig=plt.figure(dpi=200)
+ax = plt.axes(projection = proj)
+pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
+ax.coastlines(zorder=3)
+ax.gridlines(draw_labels=True,
+          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
+
+# for some reason this extent complains if you set set -180 to +180
+ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
+
+plt.colorbar(pcm)
 plt.savefig('sea_ice_thickness_uncert_estimate_{}.png'.format(DATA_FLAG))
