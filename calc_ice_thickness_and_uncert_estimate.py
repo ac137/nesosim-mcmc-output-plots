@@ -105,16 +105,16 @@ var = sea_ice_thickness #-1 to select last day of season
 
 fig=plt.figure(dpi=200)
 ax = plt.axes(projection = proj)
-ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat') # using flat shading avoids artefacts
+pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0,vmax=5) # using flat shading avoids artefacts
 ax.coastlines(zorder=3)
 ax.gridlines(draw_labels=True,
           linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
 
 # for some reason this extent complains if you set set -180 to +180
 ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
-# plt.show()
 
-plt.colorbar()
+
+plt.colorbar(pcm)
 plt.savefig('sea_ice_thickness_estimate_{}.png'.format(DATA_FLAG))
 
 
@@ -122,14 +122,13 @@ plt.savefig('sea_ice_thickness_estimate_{}.png'.format(DATA_FLAG))
 var = random_uncert
 fig=plt.figure(dpi=200)
 ax = plt.axes(projection = proj)
-ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat') # using flat shading avoids artefacts
+pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
 ax.coastlines(zorder=3)
 ax.gridlines(draw_labels=True,
           linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
 
 # for some reason this extent complains if you set set -180 to +180
 ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
-# plt.show()
 
-plt.colorbar()
+plt.colorbar(pcm)
 plt.savefig('sea_ice_thickness_uncert_{}.png'.format(DATA_FLAG))
