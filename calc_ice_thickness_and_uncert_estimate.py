@@ -79,12 +79,57 @@ random_uncert = inverse_r_w_minus_r_i*r_w*e_h_f**2 + (e_h_s*inverse_r_w_minus_r_
 random_uncert = np.sqrt(random_uncert)
 
 
-plt.figure()
-plt.imshow(sea_ice_thickness,origin='lower',vmin=0,vmax=5)
+# plt.figure()
+# plt.imshow(sea_ice_thickness,origin='lower',vmin=0,vmax=5)
+# plt.colorbar()
+# plt.savefig('sea_ice_thickness_estimate_{}.png'.format(DATA_FLAG))
+
+# plt.figure()
+# plt.imshow(random_uncert,origin='lower',vmin=0,vmax=0.5)
+# plt.colorbar()
+# plt.savefig('sea_ice_thickness_uncert_{}.png'.format(DATA_FLAG))
+
+
+# create nice maps for the plots
+
+
+
+proj=ccrs.NorthPolarStereo(central_longitude=-45)
+proj_coord = ccrs.PlateCarree()
+
+print('snow depth (m, end of season)')
+
+lons = nesosim_data['longitude']
+lats = nesosim_data['latitude']
+var = sea_ice_thickness #-1 to select last day of season
+
+fig=plt.figure(dpi=200)
+ax = plt.axes(projection = proj)
+ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat') # using flat shading avoids artefacts
+ax.coastlines(zorder=3)
+ax.gridlines(draw_labels=True,
+          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
+
+# for some reason this extent complains if you set set -180 to +180
+ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
+# plt.show()
+
 plt.colorbar()
 plt.savefig('sea_ice_thickness_estimate_{}.png'.format(DATA_FLAG))
 
-plt.figure()
-plt.imshow(random_uncert,origin='lower',vmin=0,vmax=0.5)
+
+
+var = random_uncert
+fig=plt.figure(dpi=200)
+ax = plt.axes(projection = proj)
+ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat') # using flat shading avoids artefacts
+ax.coastlines(zorder=3)
+ax.gridlines(draw_labels=True,
+          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
+
+# for some reason this extent complains if you set set -180 to +180
+ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
+# plt.show()
+
 plt.colorbar()
 plt.savefig('sea_ice_thickness_uncert_{}.png'.format(DATA_FLAG))
