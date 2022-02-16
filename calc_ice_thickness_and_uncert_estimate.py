@@ -14,9 +14,16 @@ import cartopy.crs as ccrs
 
 is2_data = xr.open_dataset('gridded_freeboard_2019-03.nc')
 
-nesosim_data_path = '/users/jk/18/acabaj/NESOSIM/output/100km/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF1.7284668037515452e-06_WPT5_LLF1.2174787315012357e-07-100kmv112par_oib_averaged_final_5k/final/NESOSIMv11_01092018-30042019.nc'
-nesosim_uncert_path = '/users/jk/19/acabaj/nesosim_uncert_output_oib_averagedfinal_5k_2018_2019_cov/averagedfinal_5k_2018_2019_covuncert_100_iter_final.nc'
+DATA_FLAG = 'oib_averaged'
 
+if DATA_FLAG == 'oib_averaged':
+	# oib averaged
+	nesosim_data_path = '/users/jk/18/acabaj/NESOSIM/output/100km/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF1.7284668037515452e-06_WPT5_LLF1.2174787315012357e-07-100kmv112par_oib_averaged_final_5k/final/NESOSIMv11_01092018-30042019.nc'
+	nesosim_uncert_path = '/users/jk/19/acabaj/nesosim_uncert_output_oib_averagedfinal_5k_2018_2019_cov/averagedfinal_5k_2018_2019_covuncert_100_iter_final.nc'
+# elif DATA_FLAG == 'oib_detailed':
+	# oib detailed
+	# nesosim_data_path = '/users/jk/18/acabaj/NESOSIM/output/100km/'
+	# nesosim_uncert_path = '/users/jk/19/acabaj/nesosim_uncert_output_oib_detailed'
 
 nesosim_data = xr.open_dataset(nesosim_data_path)
 nesosim_uncertainty = xr.open_dataset(nesosim_uncert_path)
@@ -69,12 +76,15 @@ sea_ice_thickness = h_f*r_w*inverse_r_w_minus_r_i + h_s*(r_s-r_w)*inverse_r_w_mi
 
 random_uncert = inverse_r_w_minus_r_i*r_w*e_h_f**2 + (e_h_s*inverse_r_w_minus_r_i*(r_s-r_w))**2 + (e_r_s*h_s*inverse_r_w_minus_r_i)**2 + ((h_f*r_w + h_s*r_s - h_s*r_w)*e_r_i*inverse_r_w_minus_r_i**2)**2
 
+random_uncert = np.sqrt(random_uncert)
+
+
 plt.figure()
 plt.imshow(sea_ice_thickness,origin='lower',vmin=0,vmax=5)
 plt.colorbar()
-plt.savefig('sea_ice_thickness_estimate.png')
+plt.savefig('sea_ice_thickness_estimate_{}.png'.format(DATA_FLAG))
 
 plt.figure()
-plt.imshow(random_uncert,origin='lower',vmin=0,vmax=0.2)
+plt.imshow(random_uncert,origin='lower',vmin=0,vmax=0.5)
 plt.colorbar()
-plt.savefig('sea_ice_thickness_uncert.png')
+plt.savefig('sea_ice_thickness_uncert_{}.png'.format(DATA_FLAG))
