@@ -3,6 +3,9 @@
 import numpy as np
 import pandas as pd
 import xarray as xr
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 # icesat-2 data
 is2_data = xr.open_dataset('gridded_freeboard_2019-03.nc')
@@ -74,6 +77,6 @@ print(sea_ice_uncert.shape) #should be 90x90 if all goes well...
 
 
 plt.figure()
-plt.imshow(sea_ice_uncert,origin='lower',vmin=0,vmax=5)
+plt.imshow(sea_ice_uncert,origin='lower',vmin=0,vmax=0.2)
 plt.colorbar()
 plt.savefig('sea_ice_thickness_uncert_estimate_{}.png'.format(DATA_FLAG))
