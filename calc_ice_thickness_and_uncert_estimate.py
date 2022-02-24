@@ -12,7 +12,9 @@ import cartopy.crs as ccrs
 
 # estimate based on retrieval in Petty et al 2020
 
-is2_data = xr.open_dataset('gridded_freeboard_2019-03.nc')
+monthday='2018-11'
+is2_data = xr.open_dataset('gridded_freeboard_{}.nc'.format(monthday))
+
 
 DATA_FLAG = 'oib_averaged'
 
@@ -37,10 +39,10 @@ nesosim_uncertainty['day'] = days
 # select corresponding month & calculate monthly mean
 print(nesosim_data)
 
-print(nesosim_data.sel(day='2019-03'))
+print(nesosim_data.sel(day=monthday))
 
-nesosim_data_monthly = nesosim_data.sel(day="2019-03")
-nesosim_uncert_monthly = nesosim_uncertainty.sel(day="2019-03")
+nesosim_data_monthly = nesosim_data.sel(day=monthday)
+nesosim_uncert_monthly = nesosim_uncertainty.sel(day=monthday)
 
 
 # make sure latitude and longitude are lined up!!!
@@ -113,9 +115,9 @@ ax.gridlines(draw_labels=True,
 # for some reason this extent complains if you set set -180 to +180
 ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
 
-
+plt.title('Sea ice thickness for {} (m)'.format(monthday))
 plt.colorbar(pcm)
-plt.savefig('sea_ice_thickness_estimate_{}.png'.format(DATA_FLAG))
+plt.savefig('sea_ice_thickness_estimate_{}_{}.png'.format(DATA_FLAG,monthday))
 
 
 
@@ -131,4 +133,5 @@ ax.gridlines(draw_labels=True,
 ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
 
 plt.colorbar(pcm)
-plt.savefig('sea_ice_thickness_uncert_{}.png'.format(DATA_FLAG))
+plt.title('Sea ice thickness uncertainty for {} (m)'.format(monthday))
+plt.savefig('sea_ice_thickness_uncert_{}_{}.png'.format(DATA_FLAG, monthday))
