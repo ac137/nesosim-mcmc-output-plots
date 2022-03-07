@@ -20,7 +20,8 @@ monthday='2019-03'
 is2_data = xr.open_dataset('gridded_freeboard_{}.nc'.format(monthday))
 
 
-DATA_FLAG = 'oib_averaged'
+#DATA_FLAG = 'oib_averaged'
+DATA_FLAG = 'oib_detailed'
 
 if DATA_FLAG == 'oib_averaged':
 	# oib averaged
@@ -83,7 +84,7 @@ sea_ice_thickness = h_f*r_w*inverse_r_w_minus_r_i + h_s*(r_s-r_w)*inverse_r_w_mi
 
 # random uncertainty only including snow-related terms (no ice-related terms)
 random_uncert_snow_only = (e_h_s*inverse_r_w_minus_r_i*(r_s-r_w))**2 + (e_r_s*h_s*inverse_r_w_minus_r_i)**2 
-random_uncert_snow_only = np.sqrt(random_uncert)
+random_uncert_snow_only = np.sqrt(random_uncert_snow_only)
 
 # bit redundant (shares terms with snow-only above) but I'll keep this separate for clarity
 random_uncert = inverse_r_w_minus_r_i*r_w*e_h_f**2 + (e_h_s*inverse_r_w_minus_r_i*(r_s-r_w))**2 + (e_r_s*h_s*inverse_r_w_minus_r_i)**2 + ((h_f*r_w + h_s*r_s - h_s*r_w)*e_r_i*inverse_r_w_minus_r_i**2)**2
