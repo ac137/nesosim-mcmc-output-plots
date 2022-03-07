@@ -12,7 +12,11 @@ import cartopy.crs as ccrs
 
 # estimate based on retrieval in Petty et al 2020
 
-monthday='2018-11'
+# monthday='2018-11'
+# monthday='2019-01'
+monthday='2019-03'
+# monthday='2019-04'
+
 is2_data = xr.open_dataset('gridded_freeboard_{}.nc'.format(monthday))
 
 
@@ -20,12 +24,13 @@ DATA_FLAG = 'oib_averaged'
 
 if DATA_FLAG == 'oib_averaged':
 	# oib averaged
+	# this contains the entire 2018-2019 year; if I do another year then I'll have to change this!
 	nesosim_data_path = '/users/jk/18/acabaj/NESOSIM/output/100km/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF1.7284668037515452e-06_WPT5_LLF1.2174787315012357e-07-100kmv112par_oib_averaged_final_5k/final/NESOSIMv11_01092018-30042019.nc'
 	nesosim_uncert_path = '/users/jk/19/acabaj/nesosim_uncert_output_oib_averagedfinal_5k_2018_2019_cov/averagedfinal_5k_2018_2019_covuncert_100_iter_final.nc'
-# elif DATA_FLAG == 'oib_detailed':
+elif DATA_FLAG == 'oib_detailed':
 	# oib detailed
-	# nesosim_data_path = '/users/jk/18/acabaj/NESOSIM/output/100km/'
-	# nesosim_uncert_path = '/users/jk/19/acabaj/nesosim_uncert_output_oib_detailed'
+	nesosim_data_path = '/users/jk/18/acabaj/NESOSIM/output/100km/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF2.0504155592128743e-06_WPT5_LLF4.0059442776163867e-07-100kmv112par_oib_detailed_final_5k/final/NESOSIMv11_01092018-30042019.nc'
+	nesosim_uncert_path = '/users/jk/19/acabaj/nesosim_uncert_output_oib_detailedfinal_5k_2018_2019_cov/detailedfinal_5k_2018_2019_covuncert_100_iter_final.nc'
 
 nesosim_data = xr.open_dataset(nesosim_data_path)
 nesosim_uncertainty = xr.open_dataset(nesosim_uncert_path)
@@ -76,30 +81,22 @@ inverse_r_w_minus_r_i = 1/(r_w - r_i)
 
 sea_ice_thickness = h_f*r_w*inverse_r_w_minus_r_i + h_s*(r_s-r_w)*inverse_r_w_minus_r_i
 
+# random uncertainty only including snow-related terms (no ice-related terms)
+random_uncert_snow_only = (e_h_s*inverse_r_w_minus_r_i*(r_s-r_w))**2 + (e_r_s*h_s*inverse_r_w_minus_r_i)**2 
+random_uncert_snow_only = np.sqrt(random_uncert)
+
+# bit redundant (shares terms with snow-only above) but I'll keep this separate for clarity
 random_uncert = inverse_r_w_minus_r_i*r_w*e_h_f**2 + (e_h_s*inverse_r_w_minus_r_i*(r_s-r_w))**2 + (e_r_s*h_s*inverse_r_w_minus_r_i)**2 + ((h_f*r_w + h_s*r_s - h_s*r_w)*e_r_i*inverse_r_w_minus_r_i**2)**2
 
 random_uncert = np.sqrt(random_uncert)
 
 
-# plt.figure()
-# plt.imshow(sea_ice_thickness,origin='lower',vmin=0,vmax=5)
-# plt.colorbar()
-# plt.savefig('sea_ice_thickness_estimate_{}.png'.format(DATA_FLAG))
-
-# plt.figure()
-# plt.imshow(random_uncert,origin='lower',vmin=0,vmax=0.5)
-# plt.colorbar()
-# plt.savefig('sea_ice_thickness_uncert_{}.png'.format(DATA_FLAG))
-
-
 # create nice maps for the plots
-
+# todo: make maps nicer (need to fix axis labels etc, make maps circular maybe?)
 
 
 proj=ccrs.NorthPolarStereo(central_longitude=-45)
 proj_coord = ccrs.PlateCarree()
-
-print('snow depth (m, end of season)')
 
 lons = nesosim_data['longitude']
 lats = nesosim_data['latitude']
@@ -135,3 +132,23 @@ ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
 plt.colorbar(pcm)
 plt.title('Sea ice thickness uncertainty for {} (m)'.format(monthday))
 plt.savefig('sea_ice_thickness_uncert_{}_{}.png'.format(DATA_FLAG, monthday))
+
+
+
+var = random_uncert
+fig=plt.figure(dpi=200)
+ax = plt.axes(projection = proj)
+pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
+ax.coastlines(zorder=3)
+ax.gridlines(draw_labels=True,
+          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
+
+# for some reason this extent complains if you set set -180 to +180
+ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
+
+plt.colorbar(pcm)
+plt.title('Sea ice thickness uncertainty (from snow only) for {} (m)'.format(monthday))
+plt.savefig('sea_ice_thickness_uncert_snow_only_{}_{}.png'.format(DATA_FLAG, monthday))
+
+
+# next step: save output separately (for making distribution plots, since will need to compare with ensemble)

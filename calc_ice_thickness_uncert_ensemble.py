@@ -12,7 +12,7 @@ import cartopy.crs as ccrs
 # icesat-2 data
 is2_data = xr.open_dataset('gridded_freeboard_2019-03.nc')
 
-OIB_STATUS = 'averaged'
+OIB_STATUS = 'detailed'
 EXTRA_FMT = 'final_5k_2018_2019_cov'
 DATA_FLAG = 'oib_averaged_ensemble_uncert'
 
@@ -83,12 +83,10 @@ print(sea_ice_uncert.shape) #should be 90x90 if all goes well...
 # plt.colorbar()
 # plt.savefig('sea_ice_thickness_uncert_estimate_{}.png'.format(DATA_FLAG))
 
-
+#TODO: plot titles/formatting here (make nicer, fix markings)
 
 proj=ccrs.NorthPolarStereo(central_longitude=-45)
 proj_coord = ccrs.PlateCarree()
-
-print('snow depth (m, end of season)')
 
 lons = nesosim_data['longitude'][0,:,:]
 lats = nesosim_data['latitude'][0,:,:]
@@ -105,4 +103,4 @@ ax.gridlines(draw_labels=True,
 ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
 
 plt.colorbar(pcm)
-plt.savefig('sea_ice_thickness_uncert_estimate_{}.png'.format(DATA_FLAG))
+plt.savefig('sea_ice_thickness_uncert_estimate_{}_{}.png'.format(DATA_FLAG, OIB_STATUS))
