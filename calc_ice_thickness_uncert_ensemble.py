@@ -6,6 +6,8 @@ import xarray as xr
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+
 
 # icesat-2 data
 is2_data = xr.open_dataset('gridded_freeboard_2019-03.nc')
@@ -88,8 +90,8 @@ proj_coord = ccrs.PlateCarree()
 
 print('snow depth (m, end of season)')
 
-lons = nesosim_data['longitude']
-lats = nesosim_data['latitude']
+lons = nesosim_data['longitude'][0,:,:]
+lats = nesosim_data['latitude'][0,:,:]
 
 var = sea_ice_uncert
 fig=plt.figure(dpi=200)
