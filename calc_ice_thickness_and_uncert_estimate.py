@@ -178,11 +178,16 @@ if MAKE_UNCERT_CORREL_PLOTS:
 
 	ens_uncert = xr.open_dataarray('sit_uncert_ensemble_{}.nc'.format(ens_data_flag))
 
+	# mask out nan; see if this works (need to be consistent between arrays)
+	mask1 = ~np.isnan(ens_uncert.values) & ~np.isnan(random_uncert)
+	mask2 = ~np.isnan(ens_uncert.values) & ~np.isnan(random_uncert_snow_only)
+	mask3 = ~np.isnan(random_uncert) & ~np.isnan(random_uncert_snow_only)
+
 
 	nbins = 20
 	plt.figure(dpi=200)
 
-	plt.hist2d(ens_uncert.values.flatten(), random_uncert.flatten(),bins=nbins)
+	plt.hist2d(ens_uncert.values[mask1].flatten(), random_uncert[mask1].flatten(),bins=nbins)
 	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
 	plt.xlabel('Ensemble uncertainty')
 	plt.ylabel('Total random uncertainty')
@@ -192,7 +197,7 @@ if MAKE_UNCERT_CORREL_PLOTS:
 
 	plt.figure(dpi=200)
 
-	plt.hist2d(ens_uncert.values.flatten(), random_uncert_snow_only.flatten(),bins=nbins)
+	plt.hist2d(ens_uncert.values[mask2].flatten(), random_uncert_snow_only[mask2].flatten(),bins=nbins)
 	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
 
 	plt.xlabel('Ensemble uncertainty')
@@ -202,7 +207,7 @@ if MAKE_UNCERT_CORREL_PLOTS:
 
 	plt.figure(dpi=200)
 
-	plt.hist2d(random_uncert.flatten(), random_uncert_snow_only.flatten(),bins=nbins)
+	plt.hist2d(random_uncert[mask3].flatten(), random_uncert_snow_only[mask3].flatten(),bins=nbins)
 	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
 	plt.xlabel('Total random uncertainty')
 	plt.ylabel('Snow-only random uncertainty')
