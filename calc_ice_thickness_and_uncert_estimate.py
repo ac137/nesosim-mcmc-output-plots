@@ -20,8 +20,15 @@ monthday='2019-03'
 is2_data = xr.open_dataset('gridded_freeboard_{}.nc'.format(monthday))
 
 
-#DATA_FLAG = 'oib_averaged'
-DATA_FLAG = 'oib_detailed'
+DATA_FLAG = 'oib_averaged'
+# DATA_FLAG = 'oib_detailed'
+
+
+# which plots to make (to avoid excessive re-running)
+MAKE_MAP_PLOTS = True # plot maps of uncertainty for the month
+MAKE_UNCERT_CORREL_PLOTS = True # plot correlation plots of the uncertainties
+
+
 
 if DATA_FLAG == 'oib_averaged':
 	# oib averaged
@@ -95,61 +102,111 @@ random_uncert = np.sqrt(random_uncert)
 # create nice maps for the plots
 # todo: make maps nicer (need to fix axis labels etc, make maps circular maybe?)
 
+if MAKE_MAP_PLOTS:
 
-proj=ccrs.NorthPolarStereo(central_longitude=-45)
-proj_coord = ccrs.PlateCarree()
+	proj=ccrs.NorthPolarStereo(central_longitude=-45)
+	proj_coord = ccrs.PlateCarree()
 
-lons = nesosim_data['longitude']
-lats = nesosim_data['latitude']
-var = sea_ice_thickness #-1 to select last day of season
+	lons = nesosim_data['longitude']
+	lats = nesosim_data['latitude']
+	var = sea_ice_thickness #-1 to select last day of season
 
-fig=plt.figure(dpi=200)
-ax = plt.axes(projection = proj)
-pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0,vmax=5) # using flat shading avoids artefacts
-ax.coastlines(zorder=3)
-ax.gridlines(draw_labels=True,
-          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
+	fig=plt.figure(dpi=200)
+	ax = plt.axes(projection = proj)
+	pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0,vmax=5) # using flat shading avoids artefacts
+	ax.coastlines(zorder=3)
+	ax.gridlines(draw_labels=True,
+	          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
 
-# for some reason this extent complains if you set set -180 to +180
-ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
+	# for some reason this extent complains if you set set -180 to +180
+	ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
 
-plt.title('Sea ice thickness for {} (m)'.format(monthday))
-plt.colorbar(pcm)
-plt.savefig('sea_ice_thickness_estimate_{}_{}.png'.format(DATA_FLAG,monthday))
-
-
-
-var = random_uncert
-fig=plt.figure(dpi=200)
-ax = plt.axes(projection = proj)
-pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
-ax.coastlines(zorder=3)
-ax.gridlines(draw_labels=True,
-          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
-
-# for some reason this extent complains if you set set -180 to +180
-ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
-
-plt.colorbar(pcm)
-plt.title('Sea ice thickness uncertainty for {} (m)'.format(monthday))
-plt.savefig('sea_ice_thickness_uncert_{}_{}.png'.format(DATA_FLAG, monthday))
+	plt.title('Sea ice thickness for {} (m)'.format(monthday))
+	plt.colorbar(pcm)
+	plt.savefig('sea_ice_thickness_estimate_{}_{}.png'.format(DATA_FLAG,monthday))
 
 
 
-var = random_uncert
-fig=plt.figure(dpi=200)
-ax = plt.axes(projection = proj)
-pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
-ax.coastlines(zorder=3)
-ax.gridlines(draw_labels=True,
-          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
+	var = random_uncert
+	fig=plt.figure(dpi=200)
+	ax = plt.axes(projection = proj)
+	pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
+	ax.coastlines(zorder=3)
+	ax.gridlines(draw_labels=True,
+	          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
 
-# for some reason this extent complains if you set set -180 to +180
-ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
+	# for some reason this extent complains if you set set -180 to +180
+	ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
 
-plt.colorbar(pcm)
-plt.title('Sea ice thickness uncertainty (from snow only) for {} (m)'.format(monthday))
-plt.savefig('sea_ice_thickness_uncert_snow_only_{}_{}.png'.format(DATA_FLAG, monthday))
+	plt.colorbar(pcm)
+	plt.title('Sea ice thickness uncertainty for {} (m)'.format(monthday))
+	plt.savefig('sea_ice_thickness_uncert_{}_{}.png'.format(DATA_FLAG, monthday))
 
 
-# next step: save output separately (for making distribution plots, since will need to compare with ensemble)
+
+	var = random_uncert_snow_only
+	fig=plt.figure(dpi=200)
+	ax = plt.axes(projection = proj)
+	pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
+	ax.coastlines(zorder=3)
+	ax.gridlines(draw_labels=True,
+	          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
+
+	# for some reason this extent complains if you set set -180 to +180
+	ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
+
+	plt.colorbar(pcm)
+	plt.title('Sea ice thickness uncertainty (from snow only) for {} (m)'.format(monthday))
+	plt.savefig('sea_ice_thickness_uncert_snow_only_{}_{}.png'.format(DATA_FLAG, monthday))
+
+
+# next step: compare with ensemble
+
+# load ensemble output
+
+
+
+ens_data_flag = '{}_ensemble_uncert'.format(DATA_FLAG)
+
+if MAKE_UNCERT_CORREL_PLOTS:
+	# can make the nicer seaborn plots later maybe
+	# for now just make regular histograms
+
+	# random_uncert, random_uncert_snow_only, ens_uncert
+
+	# want 3 histograms: 
+
+	ens_uncert = xr.open_dataarray('sit_uncert_ensemble_{}.nc'.format(ens_data_flag))
+
+
+	nbins = 20
+	plt.figure(dpi=200)
+
+	plt.hist2d(ens_uncert.values.flatten(), random_uncert.flatten(),bins=nbins)
+	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
+	plt.xlabel('Ensemble uncertainty')
+	plt.ylabel('Total random uncertainty')
+	plt.colorbar()
+	plt.savefig('hist_ensemble_vs_total_random_{}_{}.png'.format(DATA_FLAG, monthday))
+
+
+	plt.figure(dpi=200)
+
+	plt.hist2d(ens_uncert.values.flatten(), random_uncert_snow_only.flatten(),bins=nbins)
+	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
+
+	plt.xlabel('Ensemble uncertainty')
+	plt.ylabel('Snow-only random uncertainty')
+	plt.colorbar()
+	plt.savefig('hist_ensemble_vs_random_snow_{}_{}.png'.format(DATA_FLAG, monthday))
+
+	plt.figure(dpi=200)
+
+	plt.hist2d(random_uncert.flatten(), random_uncert_snow_only.flatten(),bins=nbins)
+	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
+	plt.xlabel('Total random uncertainty')
+	plt.ylabel('Snow-only random uncertainty')
+	plt.colorbar()
+	plt.savefig('hist_random_snow_vs_total_random_{}_{}.png'.format(DATA_FLAG, monthday))
+
+

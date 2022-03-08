@@ -12,9 +12,10 @@ import cartopy.crs as ccrs
 # icesat-2 data
 is2_data = xr.open_dataset('gridded_freeboard_2019-03.nc')
 
-OIB_STATUS = 'detailed'
+# OIB_STATUS = 'detailed'
+OIB_STATUS = 'averaged'
 EXTRA_FMT = 'final_5k_2018_2019_cov'
-DATA_FLAG = 'oib_averaged_ensemble_uncert'
+DATA_FLAG = 'oib_{}_ensemble_uncert'.format(OIB_STATUS)
 
 # open all the ensembe members and concatenate into a big dataset
 nesosim_data = xr.open_mfdataset('/users/jk/19/acabaj/nesosim_uncert_output_oib_{}{}/100km/ERA*/final/*.nc'.format(OIB_STATUS,EXTRA_FMT),combine='nested',concat_dim='iteration_number')
@@ -104,3 +105,15 @@ ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
 
 plt.colorbar(pcm)
 plt.savefig('sea_ice_thickness_uncert_estimate_{}_{}.png'.format(DATA_FLAG, OIB_STATUS))
+
+
+# save output
+
+# rename first of all
+
+sea_ice_uncert = sea_ice_uncert.rename('ensemble SIT uncertainty')
+
+# then save
+sea_ice_uncert.to_netcdf('sit_uncert_ensemble_{}.nc'.format(DATA_FLAG))
+
+# can then use this in calc_ice_thickness_and_uncert_estimate.py using xr.open_dataarray()
