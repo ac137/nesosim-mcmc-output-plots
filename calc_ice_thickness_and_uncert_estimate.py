@@ -114,6 +114,7 @@ uncert_previous = np.sqrt(uncert_previous)
 
 if MAKE_MAP_PLOTS:
 
+	# should probably make a plotting function? lots of redundancy here
 	proj=ccrs.NorthPolarStereo(central_longitude=-45)
 	proj_coord = ccrs.PlateCarree()
 
@@ -208,7 +209,13 @@ if MAKE_UNCERT_CORREL_PLOTS:
 	mask1 = ~np.isnan(ens_uncert.values) & ~np.isnan(random_uncert)
 	mask2 = ~np.isnan(ens_uncert.values) & ~np.isnan(random_uncert_snow_only)
 	mask3 = ~np.isnan(random_uncert) & ~np.isnan(random_uncert_snow_only)
+	mask4 = ~np.isnan(uncert_previous) & ~np.isnan(ens_uncert.values)
+	mask5 = ~np.isnan(uncert_previous) & ~np.isnan(random_uncert)
+	mask6 = ~np.isnan(uncert_previous) & ~np.isnan(random_uncert_snow_only)
 
+
+
+	# should maybe just make functions for this?
 
 	nbins = 20
 	plt.figure(dpi=200)
@@ -240,4 +247,24 @@ if MAKE_UNCERT_CORREL_PLOTS:
 	plt.colorbar()
 	plt.savefig('hist_random_snow_vs_total_random_{}_{}.png'.format(DATA_FLAG, monthday))
 
+	plt.hist2d(uncert_previous[mask4].flatten(), ens_uncert.values[mask4].flatten(),bins=nbins)
+	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
+	plt.xlabel('Previous uncertainty')
+	plt.ylabel('Ensemble uncertainty')
+	plt.colorbar()
+	plt.savefig('hist_previous_vs_ensemble_{}_{}.png'.format(DATA_FLAG, monthday))
+
+	plt.hist2d(uncert_previous[mask5].flatten(), random_uncert[mask5].flatten(),bins=nbins)
+	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
+	plt.xlabel('Previous uncertainty')
+	plt.ylabel('Total uncertainty')
+	plt.colorbar()
+	plt.savefig('hist_previous_vs_total_{}_{}.png'.format(DATA_FLAG, monthday))
+
+	plt.hist2d(uncert_previous[mask6].flatten(), random_uncert_snow_only[mask6].flatten(),bins=nbins)
+	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
+	plt.xlabel('Previous uncertainty')
+	plt.ylabel('Snow-only uncertainty')
+	plt.colorbar()
+	plt.savefig('hist_previous_vs_snow_only_{}_{}.png'.format(DATA_FLAG, monthday))
 
