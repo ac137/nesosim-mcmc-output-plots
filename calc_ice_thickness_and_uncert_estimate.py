@@ -82,6 +82,13 @@ h_s = nesosim_data_monthly['snow_depth'].mean(axis=0).values
 h_f = is2_data['freeboard'].values[0,:,:]
 #
 
+# uncertainties as per Petty et al 2020, for comparison
+e_h_s_previous = 0.2*h_f + 0.01 # based on fit; is this valid in this case?
+e_r_s_previous = 40 # kg/m^3, based on Warren et al
+
+# it's not random uncertainty but systematic uncertainty actually? double-check article
+
+
 # 1/(r_w-r_s) because this term shows up a lot
 inverse_r_w_minus_r_i = 1/(r_w - r_i)
 
@@ -98,6 +105,9 @@ random_uncert = inverse_r_w_minus_r_i*r_w*e_h_f**2 + (e_h_s*inverse_r_w_minus_r_
 
 random_uncert = np.sqrt(random_uncert)
 
+# uncertainties as per Petty et al 2020, for comparison
+uncert_previous = inverse_r_w_minus_r_i*r_w*e_h_f**2 + (e_h_s_previous*inverse_r_w_minus_r_i*(r_s-r_w))**2 + (e_r_s_previous*h_s*inverse_r_w_minus_r_i)**2 + ((h_f*r_w + h_s*r_s - h_s*r_w)*e_r_i*inverse_r_w_minus_r_i**2)**2
+uncert_previous = np.sqrt(uncert_previous)
 
 # create nice maps for the plots
 # todo: make maps nicer (need to fix axis labels etc, make maps circular maybe?)
@@ -158,6 +168,22 @@ if MAKE_MAP_PLOTS:
 	plt.colorbar(pcm)
 	plt.title('Sea ice thickness uncertainty (from snow only) for {} (m)'.format(monthday))
 	plt.savefig('sea_ice_thickness_uncert_snow_only_{}_{}.png'.format(DATA_FLAG, monthday))
+
+
+	var = uncert_previous
+	fig=plt.figure(dpi=200)
+	ax = plt.axes(projection = proj)
+	pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
+	ax.coastlines(zorder=3)
+	ax.gridlines(draw_labels=True,
+	          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
+
+	# for some reason this extent complains if you set set -180 to +180
+	ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
+
+	plt.colorbar(pcm)
+	plt.title('Sea ice thickness uncertainty (previous estimate) for {} (m)'.format(monthday))
+	plt.savefig('sea_ice_thickness_uncert_prev_{}_{}.png'.format(DATA_FLAG, monthday))
 
 
 # next step: compare with ensemble
