@@ -246,6 +246,7 @@ if MAKE_UNCERT_CORREL_PLOTS:
 	plt.ylabel('Snow-only random uncertainty')
 	plt.colorbar()
 	plt.savefig('hist_random_snow_vs_total_random_{}_{}.png'.format(DATA_FLAG, monthday))
+	plt.figure(dpi=200)
 
 	plt.hist2d(uncert_previous[mask4].flatten(), ens_uncert.values[mask4].flatten(),bins=nbins)
 	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
@@ -254,12 +255,14 @@ if MAKE_UNCERT_CORREL_PLOTS:
 	plt.colorbar()
 	plt.savefig('hist_previous_vs_ensemble_{}_{}.png'.format(DATA_FLAG, monthday))
 
+	plt.figure(dpi=200)
 	plt.hist2d(uncert_previous[mask5].flatten(), random_uncert[mask5].flatten(),bins=nbins)
 	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
 	plt.xlabel('Previous uncertainty')
 	plt.ylabel('Total uncertainty')
 	plt.colorbar()
 	plt.savefig('hist_previous_vs_total_{}_{}.png'.format(DATA_FLAG, monthday))
+	plt.figure(dpi=200)
 
 	plt.hist2d(uncert_previous[mask6].flatten(), random_uncert_snow_only[mask6].flatten(),bins=nbins)
 	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
