@@ -86,7 +86,7 @@ c_old = '#5fb9c9'
 ndays = len(sd_1_ts[:,0])
 x = np.arange(ndays)
 
-snow_ylim = 0.14
+snow_ylim = 0.4
 
 # plt.figure(dpi=200)
 fig, ax1 = plt.subplots(dpi=200)
