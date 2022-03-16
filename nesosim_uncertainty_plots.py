@@ -28,10 +28,18 @@ file_path_2 = '/users/jk/19/acabaj/nesosim_uncert_output_oib_averagedfinal_5k_20
 
 # print('file paths')
 
+# file paths for varying initial conditions
+
+file_path_1 = '/users/jk/18/acabaj/NESOSIM/output/100km/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF2.3450925692135826e-06_WPT5_LLF1.5380250062998322e-07-100kmv113par_oib_averaged_ic_with_ic_loglike/final/NESOSIMv11_01092010-30042011.nc'
+# budget_path_1 = '/users/jk/18/acabaj/NESOSIM/output/100km/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF2.3450925692135826e-06_WPT5_LLF1.5380250062998322e-07-100kmv113par_oib_averaged_ic_with_ic_loglike/budgets/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF2.3450925692135826e-06_WPT5_LLF1.5380250062998322e-07-100kmv113par_oib_averaged_ic_with_ic_loglike-01092010-30042011.nc'
+file_path_2 = '/users/jk/19/acabaj/nesosim_uncert_output_oib_averagedfinal_5kwith_ic_loglike_cov/averagedfinal_5kwith_ic_loglike_covuncert_100_iter_final.nc'
 
 #TODO: more descriptive variable names here
 # clean this up (taken from jupyter notebook)
 # set up to run on fileserver
+
+plot_suffix = 'ic_loglike_cov_uncert'
+
 
 # mean
 data_1 = xr.open_dataset(file_path_1)
@@ -60,7 +68,7 @@ ax.gridlines(draw_labels=True,
 
 # for some reason this extent complains if you set set -180 to +180
 ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
-plt.savefig('end_of_season_depth.png')
+plt.savefig('end_of_season_depth{}.png'.format(plot_suffix))
 
 # plotting this as 2 figures with subplots; bit difficult to read
 
@@ -80,7 +88,7 @@ ax1.coastlines()
 ax2.gridlines()
 ax2.coastlines()
 fig.colorbar(im, ax=ax2)
-plt.savefig('snow_depth_mean_and_uncertainty_end_of_season.png')
+plt.savefig('snow_depth_mean_and_uncertainty_end_of_season{}.png'.format(plot_suffix))
 
 # same plots as above but just using imshow, max set to 1 on colourbar (cutting off higher values)
 
@@ -92,7 +100,7 @@ im = ax2.imshow(data_2['snow_depth'][-1],origin='lower',vmax=0.1)
 ax2.set_title('Snow depth uncert')
 fig.colorbar(im, ax=ax2)
 plt.tight_layout()
-plt.savefig('imshow_plots_mean_and_uncertainty.png')
+plt.savefig('imshow_plots_mean_and_uncertainty{}.png'.format(plot_suffix))
 
 
 # snow density plots
@@ -106,7 +114,7 @@ im = ax2.imshow(data_2['snow_density'][-1],origin='lower')
 ax2.set_title('Uncertainty of snow density')
 fig.colorbar(im, ax=ax2)
 plt.tight_layout()
-plt.savefig('snow_density_end_of_season.png')
+plt.savefig('snow_density_end_of_season{}.png'.format(plot_suffix))
 
 # basin-wide daily mean for total snow depth
 # calculate these and save in a different file maybe?
@@ -126,7 +134,7 @@ plt.ylabel('snow depth (m)')
 plt.xlabel('days since 1 sept.')
 # plt.legend()
 # plt.show()
-plt.savefig('basin_wide_mean_uncertainty.png')
+plt.savefig('basin_wide_mean_uncertainty{}.png'.format(plot_suffix))
 
 
 #1-year mean snow depth maps
@@ -145,7 +153,7 @@ im = ax2.imshow(reg_m_2,origin='lower')
 ax2.set_title('1-year mean uncertainty')
 fig.colorbar(im, ax=ax2)
 # plt.show()
-plt.savefig('annual_mean_depth_maps.png')
+plt.savefig('annual_mean_depth_maps{}.png'.format(plot_suffix))
 
 
 # time series of snow density by layer
@@ -162,4 +170,4 @@ plt.ylabel('snow density (m)')
 plt.xlabel('days since 1 sept.')
 # plt.legend()
 # plt.show()
-plt.savefig('density_time_series_by_layer.png')
+plt.savefig('density_time_series_by_layer{}.png'.format(plot_suffix))
