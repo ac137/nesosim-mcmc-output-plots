@@ -59,9 +59,16 @@ budget_1 = xr.open_dataset(budget_path_1)
 # budget_2 = xr.open_dataset(budget_path_2)
 
 
+ice_conc_mask = 0.5
+
+budget_masked_1 = budget_1.where(budget_1['iceConc']>=ice_conc_mask)
+# print(budget_masked_1)
+
+# original nesosim masking: snowDepthT[np.where(iceConcT<ice_conc_mask)]=np.nan 
+
 # time series of snow depth by layer
 
-sd_1_ts = budget_1['snowDepth'].mean(axis=(2,3))
+sd_1_ts = budget_masked_1['snowDepth'].mean(axis=(2,3))
 # sd_2_ts = budget_2['snowDepth'].mean(axis=(2,3))
 
 
