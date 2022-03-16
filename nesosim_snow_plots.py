@@ -33,10 +33,22 @@ budget_path_1 = '/users/jk/18/acabaj/NESOSIM/output/100km/ERA5CSscaledsfERA5wind
 # BE SURE TO CHANGE FILE SAVE PATH (todo: throw in an if statement?)
 
 
+# 3par with ic loglike
+
+file_path_1 = '/users/jk/18/acabaj/NESOSIM/output/100km/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF2.3450925692135826e-06_WPT5_LLF1.5380250062998322e-07-100kmv113par_oib_averaged_ic_with_ic_loglike/final/NESOSIMv11_01092010-30042011.nc'
+budget_path_1 = '/users/jk/18/acabaj/NESOSIM/output/100km/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF2.3450925692135826e-06_WPT5_LLF1.5380250062998322e-07-100kmv113par_oib_averaged_ic_with_ic_loglike/budgets/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF2.3450925692135826e-06_WPT5_LLF1.5380250062998322e-07-100kmv113par_oib_averaged_ic_with_ic_loglike-01092010-30042011.nc'
+
+
+
 # budget_path_2 = ''
 #TODO: more descriptive variable names here
 # clean this up (taken from jupyter notebook)
 # set up to run on fileserver
+
+
+plot_suffix = '3par_with_ic_loglike'
+
+
 
 # data
 data_1 = xr.open_dataset(file_path_1)
@@ -88,7 +100,7 @@ ax2.set_ylim(200,350)
 
 
 # be sure to change file name here
-plt.savefig('time_series_ic_averaged.png')
+plt.savefig('basin_mean_time_series_{}.png'.format(plot_suffix))
 
 # plt.show()
 
