@@ -25,9 +25,9 @@ DATA_FLAG = 'oib_averaged'
 
 
 # which plots to make (to avoid excessive re-running)
-MAKE_MAP_PLOTS = True # plot maps of uncertainty for the month
-MAKE_UNCERT_CORREL_PLOTS = True # plot correlation plots of the uncertainties
-
+MAKE_MAP_PLOTS = False # plot maps of uncertainty for the month
+MAKE_UNCERT_CORREL_PLOTS = False # plot correlation plots of the uncertainties
+MAKE_SIT_CORREL_PLOTS = True # plot correlation between nesosim-mcmc and regridded is2 product sit
 
 
 if DATA_FLAG == 'oib_averaged':
@@ -194,6 +194,27 @@ if MAKE_MAP_PLOTS:
 
 
 ens_data_flag = '{}_ensemble_uncert'.format(DATA_FLAG)
+
+
+if MAKE_SIT_CORREL_PLOTS:
+
+	sit_is2 = xr.open_dataset('gridded_sit_{}.nc')
+
+	# gridded_sit_2019-03.nc
+	# correlate sit and uncertainty plots
+
+	mask1 = ~np.isnan(sit_is2.values) & ~np.isnan(sea_ice_thickness)
+
+	nbins = 20
+	plt.figure(dpi=200)
+
+	plt.hist2d(sit_is2.values[mask1].flatten(), random_uncert[mask1].flatten(),bins=nbins)
+	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
+	plt.xlabel('IS2SITMOGR4')
+	plt.ylabel('NESOSIM-MCMC SIT')
+	plt.colorbar()
+	plt.savefig('hist_is2_vs_mcmc_sit_{}_{}.png'.format(DATA_FLAG, monthday))
+
 
 if MAKE_UNCERT_CORREL_PLOTS:
 	# can make the nicer seaborn plots later maybe
