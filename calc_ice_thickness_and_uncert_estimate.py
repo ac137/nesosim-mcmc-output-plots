@@ -73,8 +73,8 @@ FIG_PATH = 'Figures/'
 
 # which plots to make (to avoid excessive re-running)
 MAKE_MAP_PLOTS = False# plot maps of uncertainty for the month
-MAKE_UNCERT_CORREL_PLOTS = False# plot correlation plots of the uncertainties
-MAKE_SIT_CORREL_PLOTS = True # plot correlation between nesosim-mcmc and regridded is2 product sit
+MAKE_SIT_CORREL_PLOTS = False # plot correlation between nesosim-mcmc and regridded is2 product sit
+MAKE_UNCERT_CORREL_PLOTS = True# plot correlation plots of the uncertainties
 
 
 if DATA_FLAG == 'oib_averaged':
@@ -170,6 +170,9 @@ if MAKE_MAP_PLOTS:
 	lats = nesosim_data['latitude']
 
 
+	# I don't have to assign variables each time (could just plug into function) 
+	# but this is more readable for me and easier to change
+
 	# sea ice thickness from NESOSIM-mcmc
 	var = sea_ice_thickness 
 	title = 'Sea ice thickness for {} (m)'.format(monthday)
@@ -218,21 +221,6 @@ if MAKE_SIT_CORREL_PLOTS:
 	# gridded_sit_2019-03.nc
 	# correlate sit and uncertainty plots
 
-	# mask1 = ~np.isnan(sit_is2.values) & ~np.isnan(sea_ice_thickness)
-
-	# mask2 = ~np.isnan(sit_uncert_is2.values) & ~np.isnan(random_uncert)
-	# mask3 = ~np.isnan(sit_uncert_is2.values) & ~np.isnan(uncert_previous)
-
-	# nbins = 20
-	# plt.figure(dpi=200)
-
-	# plt.hist2d(sit_is2.values[mask1].flatten(), sea_ice_thickness[mask1].flatten(),bins=nbins)
-	# plt.title('SIT comparison for {} (m)'.format(monthday))
-	# plt.xlabel('IS2SITMOGR4')
-	# plt.ylabel('NESOSIM-MCMC SIT')
-	# plt.colorbar()
-	# plt.savefig('hist_is2_vs_mcmc_sit_{}_{}.png'.format(DATA_FLAG, monthday))
-
 	x, y = sit_is2.values, sea_ice_thickness
 	title = 'SIT comparison for {} (m)'.format(monthday)
 	xlabel = 'IS2SITMOGR4'
@@ -242,47 +230,25 @@ if MAKE_SIT_CORREL_PLOTS:
 
 	plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
 
-	#plt.figure(dpi=200)
-	#plt.imshow(sit_uncert_is2,vmin=0,vmax=1)
-	#plt.title('ISTSITMOGR4 uncertainty')
-	#plt.colorbar()
-	#plt.savefig('is2_uncert.png')
-	
-	#plt.figure(dpi=200)
-	#plt.imshow(random_uncert,vmin=0,vmax=1)
-	#plt.title('NESOSIM-MCMC uncert')
-	#plt.colorbar()
-	#plt.savefig('nesosim-mcmc-uncert.png')
-	
-	# uncertainty difference; plot in a map?
+
+	# difference between is2 sit and nesosim-mcmc sit
+	var = sit_is2.values - sea_ice_thickness # sit value difference
+	lons = nesosim_data['longitude'] # same lat and lon used everywhere 
+	lats = nesosim_data['latitude']
+	title = 'IS2 - NESOSIM-MCMC SIT difference'
+	filename = '{}mcmc-is2-diff-map_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
+	plot_map(var, lons, lats, title, filename, vmin=-1,vmax=1,cmap='RdBu')
 
 
-	
+	# difference between is2 uncertainty and nesosim-mcmc uncertainty
 	var = sit_uncert_is2.values - random_uncert # uncertainty value difference
-	lons = nesosim_data['longitude'] # same lat and lon used everywhere I think
+	lons = nesosim_data['longitude'] 
 	lats = nesosim_data['latitude']
 	title = 'IS2 - NESOSIM-MCMC SIT uncert difference'
 	filename = '{}mcmc-is2-uncert-diff-map_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
 
 	plot_map(var, lons, lats, title, filename, vmin=-1,vmax=1,cmap='RdBu')
 
-	# plt.imshow(uncert_diff,vmin=-1,vmax=1,cmap='RdBu')
-	# plt.title('uncertainty difference')
-	# plt.colorbar()
-	# plt.savefig('mcmc-is2-uncert-diff_{}_{}.png'.format(DATA_FLAG, monthday))
-
-	# plt.figure(dpi=200)
-
-	# there's some extreme values of uncertainties = 14 that need to be excluded;
-	# try explicit range argument?
-	# could also mask but maybe do that later
-
-	# plt.hist2d(sit_uncert_is2.values[mask2].flatten(), random_uncert[mask2].flatten(),bins=nbins, range=[[0,1.2],[0,1.2]])
-	# plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
-	# plt.xlabel('IS2SITMOGR4 uncert')
-	# plt.ylabel('NESOSIM-MCMC SIT uncert')
-	# plt.colorbar()
-	# plt.savefig('hist_is2_vs_mcmc_sit_uncert_{}_{}.png'.format(DATA_FLAG, monthday))
 
 	# nesosim uncertainty vs is2 uncertainty
 	x, y = sit_uncert_is2.values, random_uncert
@@ -306,23 +272,6 @@ if MAKE_SIT_CORREL_PLOTS:
 
 
 
-	# plt.figure(dpi=200)
-
-	# plt.hist2d(sit_uncert_is2.values[mask3].flatten(), uncert_previous[mask3].flatten(),bins=nbins, range=[[0,1.2],[0,1.2]])
-	# plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
-	# plt.xlabel('IS2SITMOGR4 uncert')
-	# plt.ylabel('NESOSIM-MCMC SIT uncert P2020')
-	# plt.colorbar()
-	# plt.savefig('hist_is2_vs_mcmc_p2020_sit_uncert_{}_{}.png'.format(DATA_FLAG, monthday))
-
-	# plt.figure(dpi=200)
-	# plt.scatter(sit_uncert_is2.values.flatten(),random_uncert.flatten(),alpha=0.8)
-	# plt.xlim(0,1)
-	# plt.xlabel('IS2SITMOGR4 uncert')
-	# plt.ylabel('NESOSIM-MCMC SIT uncert')
-	# plt.savefig('scatter-nesosim-mcmc-vs-is2-uncert_{}_{}.png'.format(DATA_FLAG, monthday)
-
-
 
 if MAKE_UNCERT_CORREL_PLOTS:
 
@@ -337,68 +286,119 @@ if MAKE_UNCERT_CORREL_PLOTS:
 	ens_uncert = xr.open_dataarray('sit_uncert_ensemble_{}.nc'.format(ens_data_flag))
 
 	# mask out nan; see if this works (need to be consistent between arrays)
-	mask1 = ~np.isnan(ens_uncert.values) & ~np.isnan(random_uncert)
-	mask2 = ~np.isnan(ens_uncert.values) & ~np.isnan(random_uncert_snow_only)
-	mask3 = ~np.isnan(random_uncert) & ~np.isnan(random_uncert_snow_only)
-	mask4 = ~np.isnan(uncert_previous) & ~np.isnan(ens_uncert.values)
-	mask5 = ~np.isnan(uncert_previous) & ~np.isnan(random_uncert)
-	mask6 = ~np.isnan(uncert_previous) & ~np.isnan(random_uncert_snow_only)
+	# mask1 = ~np.isnan(ens_uncert.values) & ~np.isnan(random_uncert)
+	# mask2 = ~np.isnan(ens_uncert.values) & ~np.isnan(random_uncert_snow_only)
+	# mask3 = ~np.isnan(random_uncert) & ~np.isnan(random_uncert_snow_only)
+	# mask4 = ~np.isnan(uncert_previous) & ~np.isnan(ens_uncert.values)
+	# mask5 = ~np.isnan(uncert_previous) & ~np.isnan(random_uncert)
+	# mask6 = ~np.isnan(uncert_previous) & ~np.isnan(random_uncert_snow_only)
 
 
 
 	# should maybe just make functions for this?
 
-	nbins = 20
-	plt.figure(dpi=200)
+	# nbins = 20
+	# plt.figure(dpi=200)
 
-	plt.hist2d(ens_uncert.values[mask1].flatten(), random_uncert[mask1].flatten(),bins=nbins)
-	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
-	plt.xlabel('Ensemble uncertainty')
-	plt.ylabel('Total random uncertainty')
-	plt.colorbar()
-	plt.savefig('hist_ensemble_vs_total_random_{}_{}.png'.format(DATA_FLAG, monthday))
+	# plt.hist2d(ens_uncert.values[mask1].flatten(), random_uncert[mask1].flatten(),bins=nbins)
+	# plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
+	# plt.xlabel('Ensemble uncertainty')
+	# plt.ylabel('Total random uncertainty')
+	# plt.colorbar()
+	# plt.savefig('hist_ensemble_vs_total_random_{}_{}.png'.format(DATA_FLAG, monthday))
+
+	# total vs ensemble uncertainty
+	x, y = ens_uncert.values, random_uncert
+	title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
+	xlabel = 'Ensemble uncertainty'
+	ylabel = 'Total uncertainty'
+	filename = '{}hist_ensemble_vs_total_uncert_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
+
+	plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
 
 
-	plt.figure(dpi=200)
+	# plt.figure(dpi=200)
 
-	plt.hist2d(ens_uncert.values[mask2].flatten(), random_uncert_snow_only[mask2].flatten(),bins=nbins)
-	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
+	# plt.hist2d(ens_uncert.values[mask2].flatten(), random_uncert_snow_only[mask2].flatten(),bins=nbins)
+	# plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
 
-	plt.xlabel('Ensemble uncertainty')
-	plt.ylabel('Snow-only random uncertainty')
-	plt.colorbar()
-	plt.savefig('hist_ensemble_vs_random_snow_{}_{}.png'.format(DATA_FLAG, monthday))
+	# plt.xlabel('Ensemble uncertainty')
+	# plt.ylabel('Snow-only uncertainty')
+	# plt.colorbar()
+	# plt.savefig('hist_ensemble_vs_snow_only_uncert{}_{}.png'.format(DATA_FLAG, monthday))
 
-	plt.figure(dpi=200)
 
-	plt.hist2d(random_uncert[mask3].flatten(), random_uncert_snow_only[mask3].flatten(),bins=nbins)
-	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
-	plt.xlabel('Total random uncertainty')
-	plt.ylabel('Snow-only random uncertainty')
-	plt.colorbar()
-	plt.savefig('hist_random_snow_vs_total_random_{}_{}.png'.format(DATA_FLAG, monthday))
-	plt.figure(dpi=200)
+	x, y = ens_uncert.values, random_uncert_snow_only
+	title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
+	xlabel = 'Ensemble uncertainty'
+	ylabel = 'Total uncertainty'
+	filename = '{}hist_ensemble_vs_snow_only_uncert{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
 
-	plt.hist2d(uncert_previous[mask4].flatten(), ens_uncert.values[mask4].flatten(),bins=nbins)
-	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
-	plt.xlabel('Previous uncertainty')
-	plt.ylabel('Ensemble uncertainty')
-	plt.colorbar()
-	plt.savefig('hist_previous_vs_ensemble_{}_{}.png'.format(DATA_FLAG, monthday))
+	plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
 
-	plt.figure(dpi=200)
-	plt.hist2d(uncert_previous[mask5].flatten(), random_uncert[mask5].flatten(),bins=nbins)
-	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
-	plt.xlabel('Previous uncertainty')
-	plt.ylabel('Total uncertainty')
-	plt.colorbar()
-	plt.savefig('hist_previous_vs_total_{}_{}.png'.format(DATA_FLAG, monthday))
-	plt.figure(dpi=200)
+	# plt.figure(dpi=200)
 
-	plt.hist2d(uncert_previous[mask6].flatten(), random_uncert_snow_only[mask6].flatten(),bins=nbins)
-	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
-	plt.xlabel('Previous uncertainty')
-	plt.ylabel('Snow-only uncertainty')
-	plt.colorbar()
-	plt.savefig('hist_previous_vs_snow_only_{}_{}.png'.format(DATA_FLAG, monthday))
+	# plt.hist2d(random_uncert[mask3].flatten(), random_uncert_snow_only[mask3].flatten(),bins=nbins)
+	# plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
+	# plt.xlabel('Total random uncertainty')
+	# plt.ylabel('Snow-only random uncertainty')
+	# plt.colorbar()
+	# plt.savefig('hist_random_snow_vs_total_random_{}_{}.png'.format(DATA_FLAG, monthday))
+	# plt.figure(dpi=200)
 
+	x, y = random_uncert, random_uncert_snow_only
+	title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
+	xlabel = 'Total uncertainty'
+	ylabel = 'Snow-only uncertainty'
+	filename = '{}hist_snow_only_vs_total_uncert_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
+
+	plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+
+
+	# plt.hist2d(uncert_previous[mask4].flatten(), ens_uncert.values[mask4].flatten(),bins=nbins)
+	# plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
+	# plt.xlabel('Previous uncertainty')
+	# plt.ylabel('Ensemble uncertainty')
+	# plt.colorbar()
+	# plt.savefig('hist_previous_vs_ensemble_{}_{}.png'.format(DATA_FLAG, monthday))
+
+	x, y = uncert_previous, ens_uncert.values
+	title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
+	xlabel = 'P2020 uncertainty'
+	ylabel = 'Ensemble uncertainty'
+	filename = '{}hist_p2020_vs_ensemble_uncert_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
+
+	plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+
+	# plt.figure(dpi=200)
+	# plt.hist2d(uncert_previous[mask5].flatten(), random_uncert[mask5].flatten(),bins=nbins)
+	# plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
+	# plt.xlabel('Previous uncertainty')
+	# plt.ylabel('Total uncertainty')
+	# plt.colorbar()
+	# plt.savefig('hist_previous_vs_total_{}_{}.png'.format(DATA_FLAG, monthday))
+	# plt.figure(dpi=200)
+
+
+	x, y = uncert_previous, random_uncert
+	title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
+	xlabel = 'P2020 uncertainty'
+	ylabel = 'Total uncertainty'
+	filename = '{}hist_p2020_vs_total_uncert_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
+
+	plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+
+	# plt.hist2d(uncert_previous[mask6].flatten(), random_uncert_snow_only[mask6].flatten(),bins=nbins)
+	# plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
+	# plt.xlabel('Previous uncertainty')
+	# plt.ylabel('Snow-only uncertainty')
+	# plt.colorbar()
+	# plt.savefig('hist_previous_vs_snow_only_{}_{}.png'.format(DATA_FLAG, monthday))
+
+	x, y = uncert_previous, random_uncert_snow_only
+	title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
+	xlabel = 'P2020 uncertainty'
+	ylabel = 'Snow-only uncertainty'
+	filename = '{}hist_p2020_vs_snow_only_uncert_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
+
+	plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
