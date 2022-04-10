@@ -10,6 +10,34 @@ import os
 import pandas as pd
 import cartopy.crs as ccrs
 
+
+
+def plot_map(var, lons, lats, title, filename, **kwargs):
+	'''create a map plot of variable var, longitudes lons, latitudes lats
+	title (for plot), to be saved to file named filename. kwargs are for
+	pcolormesh (eg. vmin, vmax, cmap, etc.)
+	'''
+	proj=ccrs.NorthPolarStereo(central_longitude=-45)
+	proj_coord = ccrs.PlateCarree()
+
+
+	fig=plt.figure(dpi=200)
+	ax = plt.axes(projection = proj)
+	pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',**kwargs) # using flat shading avoids artefacts
+	ax.coastlines(zorder=3)
+	ax.gridlines(draw_labels=True,
+	          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
+
+	# for some reason this extent complains if you set set -180 to +180
+	ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
+
+	plt.title(title)
+	plt.colorbar(pcm)
+	plt.savefig(filename)
+
+
+
+
 # estimate based on retrieval in Petty et al 2020
 
 # monthday='2018-11'
@@ -23,11 +51,12 @@ is2_data = xr.open_dataset('gridded_freeboard_{}.nc'.format(monthday))
 #DATA_FLAG = 'oib_averaged'
 DATA_FLAG = 'oib_detailed'
 
+FIG_PATH = 'Figures/'
 
 # which plots to make (to avoid excessive re-running)
 MAKE_MAP_PLOTS = True# plot maps of uncertainty for the month
-MAKE_UNCERT_CORREL_PLOTS = True# plot correlation plots of the uncertainties
-MAKE_SIT_CORREL_PLOTS = True # plot correlation between nesosim-mcmc and regridded is2 product sit
+MAKE_UNCERT_CORREL_PLOTS = False# plot correlation plots of the uncertainties
+MAKE_SIT_CORREL_PLOTS = False # plot correlation between nesosim-mcmc and regridded is2 product sit
 
 
 if DATA_FLAG == 'oib_averaged':
@@ -115,76 +144,95 @@ uncert_previous = np.sqrt(uncert_previous)
 if MAKE_MAP_PLOTS:
 
 	# should probably make a plotting function? lots of redundancy here
-	proj=ccrs.NorthPolarStereo(central_longitude=-45)
-	proj_coord = ccrs.PlateCarree()
+	# proj=ccrs.NorthPolarStereo(central_longitude=-45)
+	# proj_coord = ccrs.PlateCarree()
 
-	lons = nesosim_data['longitude']
+	lons = nesosim_data['longitude'] # same lat and lon used everywhere I think
 	lats = nesosim_data['latitude']
-	var = sea_ice_thickness #-1 to select last day of season
+	# var = sea_ice_thickness 
 
-	fig=plt.figure(dpi=200)
-	ax = plt.axes(projection = proj)
-	pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0,vmax=5) # using flat shading avoids artefacts
-	ax.coastlines(zorder=3)
-	ax.gridlines(draw_labels=True,
-	          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
+	# fig=plt.figure(dpi=200)
+	# ax = plt.axes(projection = proj)
+	# pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0,vmax=5) # using flat shading avoids artefacts
+	# ax.coastlines(zorder=3)
+	# ax.gridlines(draw_labels=True,
+	#           linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
 
-	# for some reason this extent complains if you set set -180 to +180
-	ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
+	# # for some reason this extent complains if you set set -180 to +180
+	# ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
 
-	plt.title('Sea ice thickness for {} (m)'.format(monthday))
-	plt.colorbar(pcm)
-	plt.savefig('sea_ice_thickness_estimate_{}_{}.png'.format(DATA_FLAG,monthday))
+	# plt.title('Sea ice thickness for {} (m)'.format(monthday))
+	# plt.colorbar(pcm)
+	# plt.savefig('sea_ice_thickness_estimate_{}_{}.png'.format(DATA_FLAG,monthday))
 
 
+	# sea ice thickness from NESOSIM-mcmc
+	var = sea_ice_thickness 
+	title = 'Sea ice thickness for {} (m)'.format(monthday)
+	filename = '{}sea_ice_thickness_estimate_{}_{}.png'.format(FIG_PATH,DATA_FLAG,monthday)
+	plot_map(var, lons, lats, title, filename, vmin=0, vmax=5)
+
+	# var = random_uncert
+	# fig=plt.figure(dpi=200)
+	# ax = plt.axes(projection = proj)
+	# pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
+	# ax.coastlines(zorder=3)
+	# ax.gridlines(draw_labels=True,
+	#           linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
+
+	# # for some reason this extent complains if you set set -180 to +180
+	# ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
+
+	# plt.colorbar(pcm)
+	# plt.title('Sea ice thickness uncertainty for {} (m)'.format(monthday))
+	# plt.savefig('sea_ice_thickness_uncert_{}_{}.png'.format(DATA_FLAG, monthday))
 
 	var = random_uncert
-	fig=plt.figure(dpi=200)
-	ax = plt.axes(projection = proj)
-	pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
-	ax.coastlines(zorder=3)
-	ax.gridlines(draw_labels=True,
-	          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
+	title = 'Sea ice thickness uncertainty for {} (m)'.format(monthday)
+	filename = '{}sea_ice_thickness_uncert_{}_{}.png'.format(FIG_PATH,DATA_FLAG, monthday)
+	plot_map(var, lons, lats, title, filename, vmin=0, vmax=0.7)
 
-	# for some reason this extent complains if you set set -180 to +180
-	ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
+	# var = random_uncert_snow_only
+	# fig=plt.figure(dpi=200)
+	# ax = plt.axes(projection = proj)
+	# pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
+	# ax.coastlines(zorder=3)
+	# ax.gridlines(draw_labels=True,
+	#           linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
 
-	plt.colorbar(pcm)
-	plt.title('Sea ice thickness uncertainty for {} (m)'.format(monthday))
-	plt.savefig('sea_ice_thickness_uncert_{}_{}.png'.format(DATA_FLAG, monthday))
+	# # for some reason this extent complains if you set set -180 to +180
+	# ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
 
-
+	# plt.colorbar(pcm)
+	# plt.title('Sea ice thickness uncertainty (from snow only) for {} (m)'.format(monthday))
+	# plt.savefig('sea_ice_thickness_uncert_snow_only_{}_{}.png'.format(DATA_FLAG, monthday))
 
 	var = random_uncert_snow_only
-	fig=plt.figure(dpi=200)
-	ax = plt.axes(projection = proj)
-	pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
-	ax.coastlines(zorder=3)
-	ax.gridlines(draw_labels=True,
-	          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
+	title = 'Sea ice thickness uncertainty (from snow only) for {} (m)'.format(monthday)
+	filename = '{}sea_ice_thickness_uncert_snow_only_{}_{}.png'.format(FIG_PATH,DATA_FLAG, monthday)
+	plot_map(var, lons, lats, title, filename, vmin=0, vmax=0.7)
 
-	# for some reason this extent complains if you set set -180 to +180
-	ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
 
-	plt.colorbar(pcm)
-	plt.title('Sea ice thickness uncertainty (from snow only) for {} (m)'.format(monthday))
-	plt.savefig('sea_ice_thickness_uncert_snow_only_{}_{}.png'.format(DATA_FLAG, monthday))
+	# var = uncert_previous
+	# fig=plt.figure(dpi=200)
+	# ax = plt.axes(projection = proj)
+	# pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
+	# ax.coastlines(zorder=3)
+	# ax.gridlines(draw_labels=True,
+	#           linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
+
+	# # for some reason this extent complains if you set set -180 to +180
+	# ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
+
+	# plt.colorbar(pcm)
+	# plt.title('Sea ice thickness uncertainty (previous estimate) for {} (m)'.format(monthday))
+	# plt.savefig('sea_ice_thickness_uncert_prev_{}_{}.png'.format(DATA_FLAG, monthday))
 
 
 	var = uncert_previous
-	fig=plt.figure(dpi=200)
-	ax = plt.axes(projection = proj)
-	pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
-	ax.coastlines(zorder=3)
-	ax.gridlines(draw_labels=True,
-	          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
-
-	# for some reason this extent complains if you set set -180 to +180
-	ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
-
-	plt.colorbar(pcm)
-	plt.title('Sea ice thickness uncertainty (previous estimate) for {} (m)'.format(monthday))
-	plt.savefig('sea_ice_thickness_uncert_prev_{}_{}.png'.format(DATA_FLAG, monthday))
+	title = 'Sea ice thickness uncertainty (P2020 estimate) for {} (m)'.format(monthday)
+	filename = '{}sea_ice_thickness_uncert_p2020_{}_{}.png'.format(FIG_PATH,DATA_FLAG, monthday)
+	plot_map(var, lons, lats, title, filename, vmin=0, vmax=0.7)
 
 
 # next step: compare with ensemble
