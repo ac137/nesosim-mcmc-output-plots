@@ -239,11 +239,15 @@ if MAKE_SIT_CORREL_PLOTS:
 	plt.imshow(uncert_diff,vmin=-1,vmax=1,cmap='RdBu')
 	plt.title('uncertainty difference')
 	plt.colorbar()
-	plt.savefig('mcmc-is2-uncert-diff.png')
+	plt.savefig('mcmc-is2-uncert-diff_{}_{}.png'.format(DATA_FLAG, monthday)
 
 	plt.figure(dpi=200)
 
-	plt.hist2d(sit_uncert_is2.values[mask2].flatten(), random_uncert[mask2].flatten(),bins=nbins)
+	# there's some extreme values of uncertainties = 14 that need to be excluded;
+	# try explicit range argument?
+	# could also mask but maybe do that later
+
+	plt.hist2d(sit_uncert_is2.values[mask2].flatten(), random_uncert[mask2].flatten(),bins=nbins, range=[[0,1.5],[0,1.5]])
 	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
 	plt.xlabel('IS2SITMOGR4 uncert')
 	plt.ylabel('NESOSIM-MCMC SIT uncert')
@@ -254,7 +258,7 @@ if MAKE_SIT_CORREL_PLOTS:
 
 	plt.figure(dpi=200)
 
-	plt.hist2d(sit_uncert_is2.values[mask3].flatten(), uncert_previous[mask3].flatten(),bins=nbins)
+	plt.hist2d(sit_uncert_is2.values[mask3].flatten(), uncert_previous[mask3].flatten(),bins=nbins, range=[[0,1.5],[0,1.5]])
 	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
 	plt.xlabel('IS2SITMOGR4 uncert')
 	plt.ylabel('NESOSIM-MCMC SIT uncert P2020')
@@ -262,13 +266,12 @@ if MAKE_SIT_CORREL_PLOTS:
 	plt.colorbar()
 	plt.savefig('hist_is2_vs_mcmc_p2020_sit_uncert_{}_{}.png'.format(DATA_FLAG, monthday))
 
-	plt.figure(dpi=200)
-	plt.scatter(sit_uncert_is2.values.flatten(),random_uncert.flatten(),alpha=0.8)
-	plt.xlim(0,1)
-	plt.xlabel('IS2SITMOGR4 uncert')
-	plt.ylabel('NESOSIM-MCMC SIT uncert')
-	plt.savefig('scatter-nesosim-mcmc-vs-is2-uncert.png') 
-
+	# plt.figure(dpi=200)
+	# plt.scatter(sit_uncert_is2.values.flatten(),random_uncert.flatten(),alpha=0.8)
+	# plt.xlim(0,1)
+	# plt.xlabel('IS2SITMOGR4 uncert')
+	# plt.ylabel('NESOSIM-MCMC SIT uncert')
+	# plt.savefig('scatter-nesosim-mcmc-vs-is2-uncert_{}_{}.png'.format(DATA_FLAG, monthday)
 
 
 
