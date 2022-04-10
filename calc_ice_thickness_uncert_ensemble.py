@@ -12,8 +12,8 @@ import cartopy.crs as ccrs
 # icesat-2 data
 is2_data = xr.open_dataset('gridded_freeboard_2019-03.nc')
 
-# OIB_STATUS = 'detailed'
-OIB_STATUS = 'averaged'
+OIB_STATUS = 'detailed'
+#OIB_STATUS = 'averaged'
 EXTRA_FMT = 'final_5k_2018_2019_cov'
 DATA_FLAG = 'oib_{}_ensemble_uncert'.format(OIB_STATUS)
 

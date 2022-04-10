@@ -20,13 +20,13 @@ monthday='2019-03'
 is2_data = xr.open_dataset('gridded_freeboard_{}.nc'.format(monthday))
 
 
-DATA_FLAG = 'oib_averaged'
-# DATA_FLAG = 'oib_detailed'
+#DATA_FLAG = 'oib_averaged'
+DATA_FLAG = 'oib_detailed'
 
 
 # which plots to make (to avoid excessive re-running)
-MAKE_MAP_PLOTS = False # plot maps of uncertainty for the month
-MAKE_UNCERT_CORREL_PLOTS = False # plot correlation plots of the uncertainties
+MAKE_MAP_PLOTS = True# plot maps of uncertainty for the month
+MAKE_UNCERT_CORREL_PLOTS = True# plot correlation plots of the uncertainties
 MAKE_SIT_CORREL_PLOTS = True # plot correlation between nesosim-mcmc and regridded is2 product sit
 
 
