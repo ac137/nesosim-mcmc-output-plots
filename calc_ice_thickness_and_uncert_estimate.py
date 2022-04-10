@@ -36,6 +36,24 @@ def plot_map(var, lons, lats, title, filename, **kwargs):
 	plt.savefig(filename)
 
 
+def plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, nbins=20, **kwargs):
+	''' assumes x and y are unflattened nd arrays (same shape/size)
+	title, xlabel, ylabel, filename are str for plot labels
+	masks out nan values
+	kwargs for additional args to hist2d (eg. range)'''
+
+	# todo: marginal axes?
+
+	mask = ~np.isnan(x) & ~np.isnan(y)
+
+	plt.figure(dpi=200)
+
+	plt.hist2d(x[mask].flatten(), y[mask].flatten(),bins=nbins, **kwargs)
+	plt.title(title)
+	plt.xlabel(xlabel)
+	plt.ylabel(ylabel)
+	plt.colorbar()
+	plt.savefig(filename)
 
 
 # estimate based on retrieval in Petty et al 2020
@@ -54,9 +72,9 @@ DATA_FLAG = 'oib_detailed'
 FIG_PATH = 'Figures/'
 
 # which plots to make (to avoid excessive re-running)
-MAKE_MAP_PLOTS = True# plot maps of uncertainty for the month
+MAKE_MAP_PLOTS = False# plot maps of uncertainty for the month
 MAKE_UNCERT_CORREL_PLOTS = False# plot correlation plots of the uncertainties
-MAKE_SIT_CORREL_PLOTS = False # plot correlation between nesosim-mcmc and regridded is2 product sit
+MAKE_SIT_CORREL_PLOTS = True # plot correlation between nesosim-mcmc and regridded is2 product sit
 
 
 if DATA_FLAG == 'oib_averaged':
@@ -142,6 +160,7 @@ uncert_previous = np.sqrt(uncert_previous)
 # todo: make maps nicer (need to fix axis labels etc, make maps circular maybe?)
 
 if MAKE_MAP_PLOTS:
+	print('plotting sit and uncertainty map plots')
 
 	# should probably make a plotting function? lots of redundancy here
 	# proj=ccrs.NorthPolarStereo(central_longitude=-45)
@@ -149,21 +168,6 @@ if MAKE_MAP_PLOTS:
 
 	lons = nesosim_data['longitude'] # same lat and lon used everywhere I think
 	lats = nesosim_data['latitude']
-	# var = sea_ice_thickness 
-
-	# fig=plt.figure(dpi=200)
-	# ax = plt.axes(projection = proj)
-	# pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0,vmax=5) # using flat shading avoids artefacts
-	# ax.coastlines(zorder=3)
-	# ax.gridlines(draw_labels=True,
-	#           linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
-
-	# # for some reason this extent complains if you set set -180 to +180
-	# ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
-
-	# plt.title('Sea ice thickness for {} (m)'.format(monthday))
-	# plt.colorbar(pcm)
-	# plt.savefig('sea_ice_thickness_estimate_{}_{}.png'.format(DATA_FLAG,monthday))
 
 
 	# sea ice thickness from NESOSIM-mcmc
@@ -172,63 +176,21 @@ if MAKE_MAP_PLOTS:
 	filename = '{}sea_ice_thickness_estimate_{}_{}.png'.format(FIG_PATH,DATA_FLAG,monthday)
 	plot_map(var, lons, lats, title, filename, vmin=0, vmax=5)
 
-	# var = random_uncert
-	# fig=plt.figure(dpi=200)
-	# ax = plt.axes(projection = proj)
-	# pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
-	# ax.coastlines(zorder=3)
-	# ax.gridlines(draw_labels=True,
-	#           linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
 
-	# # for some reason this extent complains if you set set -180 to +180
-	# ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
-
-	# plt.colorbar(pcm)
-	# plt.title('Sea ice thickness uncertainty for {} (m)'.format(monthday))
-	# plt.savefig('sea_ice_thickness_uncert_{}_{}.png'.format(DATA_FLAG, monthday))
-
+	# sea ice thickness unertainty from NESOSIM-mcmc using uncertainty formula
 	var = random_uncert
 	title = 'Sea ice thickness uncertainty for {} (m)'.format(monthday)
 	filename = '{}sea_ice_thickness_uncert_{}_{}.png'.format(FIG_PATH,DATA_FLAG, monthday)
 	plot_map(var, lons, lats, title, filename, vmin=0, vmax=0.7)
 
-	# var = random_uncert_snow_only
-	# fig=plt.figure(dpi=200)
-	# ax = plt.axes(projection = proj)
-	# pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
-	# ax.coastlines(zorder=3)
-	# ax.gridlines(draw_labels=True,
-	#           linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
-
-	# # for some reason this extent complains if you set set -180 to +180
-	# ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
-
-	# plt.colorbar(pcm)
-	# plt.title('Sea ice thickness uncertainty (from snow only) for {} (m)'.format(monthday))
-	# plt.savefig('sea_ice_thickness_uncert_snow_only_{}_{}.png'.format(DATA_FLAG, monthday))
-
+	# 'snow only' sea ice thickness uncertainty (exclude contribution from other terms)
 	var = random_uncert_snow_only
 	title = 'Sea ice thickness uncertainty (from snow only) for {} (m)'.format(monthday)
 	filename = '{}sea_ice_thickness_uncert_snow_only_{}_{}.png'.format(FIG_PATH,DATA_FLAG, monthday)
 	plot_map(var, lons, lats, title, filename, vmin=0, vmax=0.7)
 
 
-	# var = uncert_previous
-	# fig=plt.figure(dpi=200)
-	# ax = plt.axes(projection = proj)
-	# pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',vmin=0, vmax=0.7) # using flat shading avoids artefacts
-	# ax.coastlines(zorder=3)
-	# ax.gridlines(draw_labels=True,
-	#           linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
-
-	# # for some reason this extent complains if you set set -180 to +180
-	# ax.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
-
-	# plt.colorbar(pcm)
-	# plt.title('Sea ice thickness uncertainty (previous estimate) for {} (m)'.format(monthday))
-	# plt.savefig('sea_ice_thickness_uncert_prev_{}_{}.png'.format(DATA_FLAG, monthday))
-
-
+	# uncertainty estimate using values from P2020 paper for snow uncert
 	var = uncert_previous
 	title = 'Sea ice thickness uncertainty (P2020 estimate) for {} (m)'.format(monthday)
 	filename = '{}sea_ice_thickness_uncert_p2020_{}_{}.png'.format(FIG_PATH,DATA_FLAG, monthday)
@@ -245,30 +207,40 @@ ens_data_flag = '{}_ensemble_uncert'.format(DATA_FLAG)
 
 
 if MAKE_SIT_CORREL_PLOTS:
+	print('plotting is2 correlation plots')
 
 	sit_is2 = xr.open_dataset('gridded_sit_{}.nc'.format(monthday))['sit'][0,:,:]
 
 	sit_uncert_is2 = xr.open_dataset('gridded_sit_{}.nc'.format(monthday))['sit uncertainty'][0,:,:]
 
-	print(sit_uncert_is2)
+	# print(sit_uncert_is2)
 
 	# gridded_sit_2019-03.nc
 	# correlate sit and uncertainty plots
 
-	mask1 = ~np.isnan(sit_is2.values) & ~np.isnan(sea_ice_thickness)
+	# mask1 = ~np.isnan(sit_is2.values) & ~np.isnan(sea_ice_thickness)
 
-	mask2 = ~np.isnan(sit_uncert_is2.values) & ~np.isnan(random_uncert)
-	mask3 = ~np.isnan(sit_uncert_is2.values) & ~np.isnan(uncert_previous)
+	# mask2 = ~np.isnan(sit_uncert_is2.values) & ~np.isnan(random_uncert)
+	# mask3 = ~np.isnan(sit_uncert_is2.values) & ~np.isnan(uncert_previous)
 
-	nbins = 20
-	plt.figure(dpi=200)
+	# nbins = 20
+	# plt.figure(dpi=200)
 
-	plt.hist2d(sit_is2.values[mask1].flatten(), sea_ice_thickness[mask1].flatten(),bins=nbins)
-	plt.title('SIT comparison for {} (m)'.format(monthday))
-	plt.xlabel('IS2SITMOGR4')
-	plt.ylabel('NESOSIM-MCMC SIT')
-	plt.colorbar()
-	plt.savefig('hist_is2_vs_mcmc_sit_{}_{}.png'.format(DATA_FLAG, monthday))
+	# plt.hist2d(sit_is2.values[mask1].flatten(), sea_ice_thickness[mask1].flatten(),bins=nbins)
+	# plt.title('SIT comparison for {} (m)'.format(monthday))
+	# plt.xlabel('IS2SITMOGR4')
+	# plt.ylabel('NESOSIM-MCMC SIT')
+	# plt.colorbar()
+	# plt.savefig('hist_is2_vs_mcmc_sit_{}_{}.png'.format(DATA_FLAG, monthday))
+
+	x, y = sit_is2.values, sea_ice_thickness
+	title = 'SIT comparison for {} (m)'.format(monthday)
+	xlabel = 'IS2SITMOGR4'
+	ylabel = 'NESOSIM-MCMC SIT'
+	
+	filename = '{}hist_is2_vs_mcmc_sit_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
+
+	plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
 
 	#plt.figure(dpi=200)
 	#plt.imshow(sit_uncert_is2,vmin=0,vmax=1)
@@ -282,35 +254,66 @@ if MAKE_SIT_CORREL_PLOTS:
 	#plt.colorbar()
 	#plt.savefig('nesosim-mcmc-uncert.png')
 	
-	plt.figure(dpi=200)
-	uncert_diff = sit_uncert_is2.values - random_uncert
-	plt.imshow(uncert_diff,vmin=-1,vmax=1,cmap='RdBu')
-	plt.title('uncertainty difference')
-	plt.colorbar()
-	plt.savefig('mcmc-is2-uncert-diff_{}_{}.png'.format(DATA_FLAG, monthday))
+	# uncertainty difference; plot in a map?
 
-	plt.figure(dpi=200)
+
+	
+	var = sit_uncert_is2.values - random_uncert # uncertainty value difference
+	lons = nesosim_data['longitude'] # same lat and lon used everywhere I think
+	lats = nesosim_data['latitude']
+	title = 'IS2 - NESOSIM-MCMC SIT uncert difference'
+	filename = '{}mcmc-is2-uncert-diff-map_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
+
+	plot_map(var, lons, lats, title, filename, vmin=-1,vmax=1,cmap='RdBu')
+
+	# plt.imshow(uncert_diff,vmin=-1,vmax=1,cmap='RdBu')
+	# plt.title('uncertainty difference')
+	# plt.colorbar()
+	# plt.savefig('mcmc-is2-uncert-diff_{}_{}.png'.format(DATA_FLAG, monthday))
+
+	# plt.figure(dpi=200)
 
 	# there's some extreme values of uncertainties = 14 that need to be excluded;
 	# try explicit range argument?
 	# could also mask but maybe do that later
 
-	plt.hist2d(sit_uncert_is2.values[mask2].flatten(), random_uncert[mask2].flatten(),bins=nbins, range=[[0,1.2],[0,1.2]])
-	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
-	plt.xlabel('IS2SITMOGR4 uncert')
-	plt.ylabel('NESOSIM-MCMC SIT uncert')
-	plt.colorbar()
-	plt.savefig('hist_is2_vs_mcmc_sit_uncert_{}_{}.png'.format(DATA_FLAG, monthday))
+	# plt.hist2d(sit_uncert_is2.values[mask2].flatten(), random_uncert[mask2].flatten(),bins=nbins, range=[[0,1.2],[0,1.2]])
+	# plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
+	# plt.xlabel('IS2SITMOGR4 uncert')
+	# plt.ylabel('NESOSIM-MCMC SIT uncert')
+	# plt.colorbar()
+	# plt.savefig('hist_is2_vs_mcmc_sit_uncert_{}_{}.png'.format(DATA_FLAG, monthday))
+
+	# nesosim uncertainty vs is2 uncertainty
+	x, y = sit_uncert_is2.values, random_uncert
+	title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
+	xlabel = 'IS2SITMOGR4 uncert'
+	ylabel = 'NESOSIM-MCMC SIT uncert'
+	
+	filename = '{}hist_is2_vs_mcmc_sit_uncert_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
+
+	plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, range=[[0,1.2],[0,1.2]])
+
+	# nesosim uncertainty calculated using p2020 vs. is2 uncertainty
+	x, y = sit_uncert_is2.values, uncert_previous
+	title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
+	xlabel = 'IS2SITMOGR4 uncert'
+	ylabel = 'NESOSIM-MCMC SIT uncert P2020'
+	
+	filename = '{}hist_is2_vs_mcmc_p2020_sit_uncert_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
+
+	plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, range=[[0,1.2],[0,1.2]])
 
 
-	plt.figure(dpi=200)
 
-	plt.hist2d(sit_uncert_is2.values[mask3].flatten(), uncert_previous[mask3].flatten(),bins=nbins, range=[[0,1.2],[0,1.2]])
-	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
-	plt.xlabel('IS2SITMOGR4 uncert')
-	plt.ylabel('NESOSIM-MCMC SIT uncert P2020')
-	plt.colorbar()
-	plt.savefig('hist_is2_vs_mcmc_p2020_sit_uncert_{}_{}.png'.format(DATA_FLAG, monthday))
+	# plt.figure(dpi=200)
+
+	# plt.hist2d(sit_uncert_is2.values[mask3].flatten(), uncert_previous[mask3].flatten(),bins=nbins, range=[[0,1.2],[0,1.2]])
+	# plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
+	# plt.xlabel('IS2SITMOGR4 uncert')
+	# plt.ylabel('NESOSIM-MCMC SIT uncert P2020')
+	# plt.colorbar()
+	# plt.savefig('hist_is2_vs_mcmc_p2020_sit_uncert_{}_{}.png'.format(DATA_FLAG, monthday))
 
 	# plt.figure(dpi=200)
 	# plt.scatter(sit_uncert_is2.values.flatten(),random_uncert.flatten(),alpha=0.8)
@@ -322,6 +325,8 @@ if MAKE_SIT_CORREL_PLOTS:
 
 
 if MAKE_UNCERT_CORREL_PLOTS:
+
+	print('plotting nesosim uncertainty correlation plots')
 	# can make the nicer seaborn plots later maybe
 	# for now just make regular histograms
 
