@@ -202,7 +202,7 @@ if MAKE_SIT_CORREL_PLOTS:
 
 	sit_uncert_is2 = xr.open_dataset('gridded_sit_{}.nc'.format(monthday))['sit uncertainty'][0,:,:]
 
-	print(sit_is2)
+	print(sit_uncert_is2)
 
 	# gridded_sit_2019-03.nc
 	# correlate sit and uncertainty plots
@@ -222,12 +222,32 @@ if MAKE_SIT_CORREL_PLOTS:
 	plt.colorbar()
 	plt.savefig('hist_is2_vs_mcmc_sit_{}_{}.png'.format(DATA_FLAG, monthday))
 
+	#plt.figure(dpi=200)
+	#plt.imshow(sit_uncert_is2,vmin=0,vmax=1)
+	#plt.title('ISTSITMOGR4 uncertainty')
+	#plt.colorbar()
+	#plt.savefig('is2_uncert.png')
+	
+	#plt.figure(dpi=200)
+	#plt.imshow(random_uncert,vmin=0,vmax=1)
+	#plt.title('NESOSIM-MCMC uncert')
+	#plt.colorbar()
+	#plt.savefig('nesosim-mcmc-uncert.png')
+	
+	plt.figure(dpi=200)
+	uncert_diff = sit_uncert_is2.values - random_uncert
+	plt.imshow(uncert_diff,vmin=-1,vmax=1,cmap='RdBu')
+	plt.title('uncertainty difference')
+	plt.colorbar()
+	plt.savefig('mcmc-is2-uncert-diff.png')
+
 	plt.figure(dpi=200)
 
 	plt.hist2d(sit_uncert_is2.values[mask2].flatten(), random_uncert[mask2].flatten(),bins=nbins)
 	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
 	plt.xlabel('IS2SITMOGR4 uncert')
 	plt.ylabel('NESOSIM-MCMC SIT uncert')
+	plt.xlim(0,1)
 	plt.colorbar()
 	plt.savefig('hist_is2_vs_mcmc_sit_uncert_{}_{}.png'.format(DATA_FLAG, monthday))
 
@@ -238,8 +258,16 @@ if MAKE_SIT_CORREL_PLOTS:
 	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
 	plt.xlabel('IS2SITMOGR4 uncert')
 	plt.ylabel('NESOSIM-MCMC SIT uncert P2020')
+	plt.xlim(0,1)
 	plt.colorbar()
 	plt.savefig('hist_is2_vs_mcmc_p2020_sit_uncert_{}_{}.png'.format(DATA_FLAG, monthday))
+
+	plt.figure(dpi=200)
+	plt.scatter(sit_uncert_is2.values.flatten(),random_uncert.flatten(),alpha=0.8)
+	plt.xlim(0,1)
+	plt.xlabel('IS2SITMOGR4 uncert')
+	plt.ylabel('NESOSIM-MCMC SIT uncert')
+	plt.savefig('scatter-nesosim-mcmc-vs-is2-uncert.png') 
 
 
 
