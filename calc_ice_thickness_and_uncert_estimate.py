@@ -50,9 +50,9 @@ nesosim_data['day'] = days
 nesosim_uncertainty['day'] = days
 
 # select corresponding month & calculate monthly mean
-print(nesosim_data)
+#print(nesosim_data)
 
-print(nesosim_data.sel(day=monthday))
+#print(nesosim_data.sel(day=monthday))
 
 nesosim_data_monthly = nesosim_data.sel(day=monthday)
 nesosim_uncert_monthly = nesosim_uncertainty.sel(day=monthday)
@@ -198,7 +198,8 @@ ens_data_flag = '{}_ensemble_uncert'.format(DATA_FLAG)
 
 if MAKE_SIT_CORREL_PLOTS:
 
-	sit_is2 = xr.open_dataset('gridded_sit_{}.nc')
+	sit_is2 = xr.open_dataset('gridded_sit_{}.nc'.format(monthday))['sit'][0,:,:]
+	print(sit_is2)
 
 	# gridded_sit_2019-03.nc
 	# correlate sit and uncertainty plots
@@ -208,8 +209,8 @@ if MAKE_SIT_CORREL_PLOTS:
 	nbins = 20
 	plt.figure(dpi=200)
 
-	plt.hist2d(sit_is2.values[mask1].flatten(), random_uncert[mask1].flatten(),bins=nbins)
-	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
+	plt.hist2d(sit_is2.values[mask1].flatten(), sea_ice_thickness[mask1].flatten(),bins=nbins)
+	plt.title('SIT comparison for {} (m)'.format(monthday))
 	plt.xlabel('IS2SITMOGR4')
 	plt.ylabel('NESOSIM-MCMC SIT')
 	plt.colorbar()
