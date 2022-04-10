@@ -234,7 +234,7 @@ if MAKE_SIT_CORREL_PLOTS:
 
 	plt.figure(dpi=200)
 
-	plt.hist2d(sit_uncert_is2.values[mask2].flatten(), uncert_previous[mask2].flatten(),bins=nbins)
+	plt.hist2d(sit_uncert_is2.values[mask3].flatten(), uncert_previous[mask3].flatten(),bins=nbins)
 	plt.title('SIT uncertainty comparison for {} (m)'.format(monthday))
 	plt.xlabel('IS2SITMOGR4 uncert')
 	plt.ylabel('NESOSIM-MCMC SIT uncert P2020')
