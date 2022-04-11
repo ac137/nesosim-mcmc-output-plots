@@ -249,7 +249,7 @@ if MAKE_SIT_CORREL_PLOTS:
 	var = sit_is2.values
 	lons = nesosim_data['longitude']
 	lats = nesosim_data['latitude']
-	title = 'IS2SITMOGR4 sea ice thickness (m)'
+	title = 'IS2SITMOGR4 sea ice thickness for {} (m)'.format(monthday)
 	filename = '{}mcmc-is2-sit-map_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
 	plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=0, vmax=5)
 
@@ -257,7 +257,7 @@ if MAKE_SIT_CORREL_PLOTS:
 	var = sit_is2.values - sea_ice_thickness # sit value difference
 	lons = nesosim_data['longitude'] # same lat and lon used everywhere 
 	lats = nesosim_data['latitude']
-	title = 'IS2 - NESOSIM-MCMC SIT difference (m)'
+	title = 'IS2 - NESOSIM-MCMC SIT difference for {} (m)'.format(monthday)
 	filename = '{}mcmc-is2-diff-map_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
 	plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=-4, vmax=4, cmap='RdBu')
 
@@ -266,7 +266,7 @@ if MAKE_SIT_CORREL_PLOTS:
 	var = sit_uncert_is2.values - random_uncert # uncertainty value difference
 	lons = nesosim_data['longitude'] 
 	lats = nesosim_data['latitude']
-	title = 'IS2 - NESOSIM-MCMC SIT uncert difference (m)'
+	title = 'IS2 - NESOSIM-MCMC SIT uncert difference for {} (m)'.format(monthday)
 	filename = '{}mcmc-is2-uncert-diff-map_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
 
 	plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=-1,vmax=1,cmap='RdBu')
