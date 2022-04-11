@@ -12,10 +12,11 @@ import cartopy.crs as ccrs
 
 
 
-def plot_map(var, lons, lats, title, filename, **kwargs):
+def plot_map(var, lons, lats, title, filename, sic, **kwargs):
 	'''create a map plot of variable var, longitudes lons, latitudes lats
-	title (for plot), to be saved to file named filename. kwargs are for
-	pcolormesh (eg. vmin, vmax, cmap, etc.)
+	title (for plot), to be saved to file named filename.
+	sic is a 2d array of sea ice concentration (binary mask?)
+	kwargs are for pcolormesh (eg. vmin, vmax, cmap, etc.)
 	'''
 	proj=ccrs.NorthPolarStereo(central_longitude=-45)
 	proj_coord = ccrs.PlateCarree()
@@ -23,6 +24,8 @@ def plot_map(var, lons, lats, title, filename, **kwargs):
 
 	fig=plt.figure(dpi=200)
 	ax = plt.axes(projection = proj)
+	# sic mask; factor of 0.3 to adjust shading colour
+	ax.pcolormesh(lons,lats,sic*0.3, transform=proj_coord, shading='flat', cmap="Greys",vmin=0,vmax=1, label='SIC >= 0.5')
 	pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',**kwargs) # using flat shading avoids artefacts
 	ax.coastlines(zorder=3)
 	ax.gridlines(draw_labels=True,
@@ -33,6 +36,12 @@ def plot_map(var, lons, lats, title, filename, **kwargs):
 
 	plt.title(title)
 	plt.colorbar(pcm)
+
+	# need to manually add legend, apparently
+	sic_legend_patch = matplotlib.patches.Rectangle((0, 0), 1, 1, facecolor="#CECECE")
+	labels = ['SIC >= 0.5']
+	plt.legend([sic_legend_patch], labels)#,
+             #  loc='lower left')#, bbox_to_anchor=(0.025, -0.1), fancybox=True)
 	plt.savefig(filename)
 
 
@@ -66,15 +75,15 @@ monthday='2019-03'
 is2_data = xr.open_dataset('gridded_freeboard_{}.nc'.format(monthday))
 
 
-#DATA_FLAG = 'oib_averaged'
-DATA_FLAG = 'oib_detailed'
+DATA_FLAG = 'oib_averaged'
+#DATA_FLAG = 'oib_detailed'
 
 FIG_PATH = 'Figures/'
 
 # which plots to make (to avoid excessive re-running)
-MAKE_MAP_PLOTS = False# plot maps of uncertainty for the month
-MAKE_SIT_CORREL_PLOTS = False # plot correlation between nesosim-mcmc and regridded is2 product sit
-MAKE_UNCERT_CORREL_PLOTS = True# plot correlation plots of the uncertainties
+MAKE_MAP_PLOTS = True# plot maps of uncertainty for the month
+MAKE_SIT_CORREL_PLOTS = False# plot correlation between nesosim-mcmc and regridded is2 product sit
+MAKE_UNCERT_CORREL_PLOTS = False# plot correlation plots of the uncertainties
 
 
 if DATA_FLAG == 'oib_averaged':
@@ -97,7 +106,7 @@ nesosim_data['day'] = days
 nesosim_uncertainty['day'] = days
 
 # select corresponding month & calculate monthly mean
-#print(nesosim_data)
+print(nesosim_data)
 
 #print(nesosim_data.sel(day=monthday))
 
@@ -128,6 +137,13 @@ h_s = nesosim_data_monthly['snow_depth'].mean(axis=0).values
 # freeboard height
 h_f = is2_data['freeboard'].values[0,:,:]
 #
+nesosim_sic = nesosim_data_monthly['ice_concentration'].mean(axis=0).values
+
+# create a binary sic mask
+SIC_THRESHOLD = 0.5
+ice_mask_idx = (nesosim_sic >= SIC_THRESHOLD) & ~np.isnan(nesosim_sic) # true if we want to use sic
+ice_mask_idx = ice_mask_idx.astype(float) # 1 if sic is >= threshold 
+print(ice_mask_idx)
 
 # uncertainties as per Petty et al 2020, for comparison
 e_h_s_previous = 0.2*h_f + 0.01 # based on fit; is this valid in this case?
@@ -177,27 +193,27 @@ if MAKE_MAP_PLOTS:
 	var = sea_ice_thickness 
 	title = 'Sea ice thickness for {} (m)'.format(monthday)
 	filename = '{}sea_ice_thickness_estimate_{}_{}.png'.format(FIG_PATH,DATA_FLAG,monthday)
-	plot_map(var, lons, lats, title, filename, vmin=0, vmax=5)
+	plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=0, vmax=5)
 
 
 	# sea ice thickness unertainty from NESOSIM-mcmc using uncertainty formula
 	var = random_uncert
 	title = 'Sea ice thickness uncertainty for {} (m)'.format(monthday)
 	filename = '{}sea_ice_thickness_uncert_{}_{}.png'.format(FIG_PATH,DATA_FLAG, monthday)
-	plot_map(var, lons, lats, title, filename, vmin=0, vmax=0.7)
+	plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=0, vmax=0.7)
 
 	# 'snow only' sea ice thickness uncertainty (exclude contribution from other terms)
 	var = random_uncert_snow_only
 	title = 'Sea ice thickness uncertainty (from snow only) for {} (m)'.format(monthday)
 	filename = '{}sea_ice_thickness_uncert_snow_only_{}_{}.png'.format(FIG_PATH,DATA_FLAG, monthday)
-	plot_map(var, lons, lats, title, filename, vmin=0, vmax=0.7)
+	plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=0, vmax=0.7)
 
 
 	# uncertainty estimate using values from P2020 paper for snow uncert
 	var = uncert_previous
 	title = 'Sea ice thickness uncertainty (P2020 estimate) for {} (m)'.format(monthday)
 	filename = '{}sea_ice_thickness_uncert_p2020_{}_{}.png'.format(FIG_PATH,DATA_FLAG, monthday)
-	plot_map(var, lons, lats, title, filename, vmin=0, vmax=0.7)
+	plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=0, vmax=0.7)
 
 
 # next step: compare with ensemble
@@ -236,7 +252,7 @@ if MAKE_SIT_CORREL_PLOTS:
 	lats = nesosim_data['latitude']
 	title = 'IS2 - NESOSIM-MCMC SIT difference'
 	filename = '{}mcmc-is2-diff-map_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
-	plot_map(var, lons, lats, title, filename, vmin=-1,vmax=1,cmap='RdBu')
+	plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=-4, vmax=4, cmap='RdBu')
 
 
 	# difference between is2 uncertainty and nesosim-mcmc uncertainty
@@ -246,7 +262,7 @@ if MAKE_SIT_CORREL_PLOTS:
 	title = 'IS2 - NESOSIM-MCMC SIT uncert difference'
 	filename = '{}mcmc-is2-uncert-diff-map_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
 
-	plot_map(var, lons, lats, title, filename, vmin=-1,vmax=1,cmap='RdBu')
+	plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=-1,vmax=1,cmap='RdBu')
 
 
 	# nesosim uncertainty vs is2 uncertainty
