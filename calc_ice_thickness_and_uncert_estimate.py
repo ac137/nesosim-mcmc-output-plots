@@ -75,15 +75,15 @@ monthday='2019-03'
 is2_data = xr.open_dataset('gridded_freeboard_{}.nc'.format(monthday))
 
 
-DATA_FLAG = 'oib_averaged'
-#DATA_FLAG = 'oib_detailed'
+#DATA_FLAG = 'oib_averaged'
+DATA_FLAG = 'oib_detailed'
 
-FIG_PATH = 'Figures/'
+FIG_PATH = 'Figures/{}/'.format(monthday)
 
 # which plots to make (to avoid excessive re-running)
 MAKE_MAP_PLOTS = True# plot maps of uncertainty for the month
-MAKE_SIT_CORREL_PLOTS = False# plot correlation between nesosim-mcmc and regridded is2 product sit
-MAKE_UNCERT_CORREL_PLOTS = False# plot correlation plots of the uncertainties
+MAKE_SIT_CORREL_PLOTS = True# plot correlation between nesosim-mcmc and regridded is2 product sit
+MAKE_UNCERT_CORREL_PLOTS = True# plot correlation plots of the uncertainties
 
 
 if DATA_FLAG == 'oib_averaged':
@@ -245,12 +245,19 @@ if MAKE_SIT_CORREL_PLOTS:
 
 	plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
 
+	# plot is2 map
+	var = sit_is2.values
+	lons = nesosim_data['longitude']
+	lats = nesosim_data['latitude']
+	title = 'IS2SITMOGR4 sea ice thickness (m)'
+	filename = '{}mcmc-is2-sit-map_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
+	plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=0, vmax=5)
 
 	# difference between is2 sit and nesosim-mcmc sit
 	var = sit_is2.values - sea_ice_thickness # sit value difference
 	lons = nesosim_data['longitude'] # same lat and lon used everywhere 
 	lats = nesosim_data['latitude']
-	title = 'IS2 - NESOSIM-MCMC SIT difference'
+	title = 'IS2 - NESOSIM-MCMC SIT difference (m)'
 	filename = '{}mcmc-is2-diff-map_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
 	plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=-4, vmax=4, cmap='RdBu')
 
@@ -259,7 +266,7 @@ if MAKE_SIT_CORREL_PLOTS:
 	var = sit_uncert_is2.values - random_uncert # uncertainty value difference
 	lons = nesosim_data['longitude'] 
 	lats = nesosim_data['latitude']
-	title = 'IS2 - NESOSIM-MCMC SIT uncert difference'
+	title = 'IS2 - NESOSIM-MCMC SIT uncert difference (m)'
 	filename = '{}mcmc-is2-uncert-diff-map_{}_{}.png'.format(FIG_PATH, DATA_FLAG, monthday)
 
 	plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=-1,vmax=1,cmap='RdBu')
