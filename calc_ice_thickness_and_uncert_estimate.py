@@ -13,7 +13,7 @@ import cartopy.crs as ccrs
 
 
 
-def plot_map(var, lons, lats, title, filename, sic, **kwargs):
+def plot_map(var, lons, lats, title, filename, sic, cmap='Blues', **kwargs):
 	'''create a map plot of variable var, longitudes lons, latitudes lats
 	title (for plot), to be saved to file named filename.
 	sic is a 2d array of sea ice concentration (binary mask?)
@@ -27,7 +27,7 @@ def plot_map(var, lons, lats, title, filename, sic, **kwargs):
 	ax = plt.axes(projection = proj)
 	# sic mask; factor of 0.3 to adjust shading colour
 	ax.pcolormesh(lons,lats,sic*0.3, transform=proj_coord, shading='flat', cmap="Greys",vmin=0,vmax=1, label='SIC >= 0.5')
-	pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat',**kwargs) # using flat shading avoids artefacts
+	pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat', cmap=cmap, **kwargs) # using flat shading avoids artefacts
 	ax.coastlines(zorder=3)
 	ax.gridlines(draw_labels=True,
 	          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
@@ -69,7 +69,7 @@ def plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, nbins=20, **kwar
 
 
 # which plots to make (to avoid excessive re-running)
-MAKE_MAP_PLOTS = False# plot maps of uncertainty for the month
+MAKE_MAP_PLOTS = True# plot maps of uncertainty for the month
 MAKE_SIT_CORREL_PLOTS = True# plot correlation between nesosim-mcmc and regridded is2 product sit
 MAKE_UNCERT_CORREL_PLOTS = False# plot correlation plots of the uncertainties
 
@@ -86,8 +86,11 @@ MAKE_UNCERT_CORREL_PLOTS = False# plot correlation plots of the uncertainties
 # data_flag = 'oib_detailed'
 
 
-data_flag_list = ['oib_averaged', 'oib_detailed']
-date_list = ['2018-11', '2019-01', '2019-03']
+# data_flag_list = ['oib_averaged', 'oib_detailed']
+# date_list = ['2018-11', '2019-01', '2019-03']
+
+data_flag_list = ['oib_detailed']
+date_list = ['2019-03']
 
 # big for loop? iterate over data_flag and monthday
 # data_flag is no longer a constant I guess
