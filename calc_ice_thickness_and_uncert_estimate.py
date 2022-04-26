@@ -62,7 +62,7 @@ def plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, nbins=20, cmap='
 
 	# plt.figure(dpi=200)
 	# sns.jointplot(x[mask].flatten(), y[mask].flatten(), color='m')
-	histplot = sns.jointplot(x[mask].flatten(), y[mask].flatten(), kind="hist",bins=nbins, cbar=True,marginal_ticks=False, color='m',space=0.4,marginal_kws=dict(bins=nbins),cbar_kws=dict(label='Count'))#,cmap='viridis')#,cbar_kws = dict(use_gridspec=False,location="bottom"))
+	histplot = sns.jointplot(x[mask].flatten(), y[mask].flatten(), kind="hist",bins=nbins, cbar=True,marginal_ticks=False, color='m',space=0.4,marginal_kws=dict(bins=nbins,**kwargs),cbar_kws=dict(label='Count'),**kwargs)#,cmap='viridis')#,cbar_kws = dict(use_gridspec=False,location="bottom"))
 
 	plt.subplots_adjust(left=0.1, right=0.8, top=0.9, bottom=0.1)
 	# get the current positions of the joint ax and the ax for the marginal x
@@ -79,6 +79,7 @@ def plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, nbins=20, cmap='
 	# sns.despine(offset=40)
 
 	histplot.set_axis_labels(xlabel, ylabel)
+	histplot.fig.suptitle(title)
 
 
 
@@ -87,7 +88,8 @@ def plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, nbins=20, cmap='
 	# plt.xlabel(xlabel)
 	# plt.ylabel(ylabel)
 	# plt.colorbar()
-	plt.savefig(filename)
+	#plt.tight_layout()
+	plt.savefig(filename,bbox_inches = 'tight')
 
 def plot_nan_masked_hist_1d(data1, data2, title, data1_name, data2_name, filename, xlabel, ylabel, nbins=20, alpha=0.7,**kwargs):
 	''' assumes x and y are unflattened nd arrays (same shape/size)
@@ -111,7 +113,7 @@ def plot_nan_masked_hist_1d(data1, data2, title, data1_name, data2_name, filenam
 
 
 # which plots to make (to avoid excessive re-running)
-MAKE_MAP_PLOTS = True# plot maps of uncertainty for the month
+MAKE_MAP_PLOTS = False# plot maps of uncertainty for the month
 MAKE_SIT_CORREL_PLOTS = True# plot correlation between nesosim-mcmc and regridded is2 product sit
 MAKE_UNCERT_CORREL_PLOTS = True# plot correlation plots of the uncertainties
 
@@ -358,7 +360,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		filename = '{}hist_is2_vs_mcmc_sit_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
 		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, range=[[0,1.2],[0,1.2]])
-		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename,binrange=[0,1.2])#,xlim=(0,1.2),ylim=(0,1.2))
 
 		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
@@ -373,7 +375,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		filename = '{}hist_is2_vs_mcmc_p2020_sit_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
 		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, range=[[0,1.2],[0,1.2]])
-		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename,binrange=[0,1.2])#,xlim=(0,1.2),ylim=(0,1.2))
 
 		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
