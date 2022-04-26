@@ -65,7 +65,25 @@ def plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, nbins=20, cmap='
 	plt.colorbar()
 	plt.savefig(filename)
 
+def plot_nan_masked_hist_1d(data1, data2, title, data1_name, data2_name, filename, xlabel, ylabel, nbins=20, alpha=0.7,**kwargs):
+	''' assumes x and y are unflattened nd arrays (same shape/size)
+	title, xlabel, ylabel, filename are str for plot labels
+	masks out nan values
+	kwargs for additional args to hist2d (eg. range)'''
 
+	# todo: marginal axes? adjust colormap, etc.
+
+	mask = ~np.isnan(x) & ~np.isnan(y)
+
+	plt.figure(dpi=200)
+	plt.hist(x[mask].flatten(),bins=nbins, alpha=alpha, label=xlabel, **kwargs)
+	plt.hist(y[mask].flatten(),bins=nbins, alpha=alpha, label=ylabel, **kwargs)
+	plt.title(title)
+	plt.ylabel(ylabel)
+	plt.xlabel(xlabel)
+	plt.colorbar()
+	fn2 = '1d_' + filename
+	plt.savefig(fn2)
 
 
 # which plots to make (to avoid excessive re-running)
@@ -260,10 +278,14 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		title = 'SIT comparison for {} (m)'.format(monthday)
 		xlabel = 'IS2SITMOGR4'
 		ylabel = 'NESOSIM-MCMC SIT'
+		horiz_label = 'SIT (m)'
+		vert_label = 'Number of grid cells'
 		
 		filename = '{}hist_is2_vs_mcmc_sit_{}_{}.png'.format(fig_path, data_flag, monthday)
 
-		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
+
 
 		# plot is2 map
 		var = sit_is2.values
@@ -307,20 +329,25 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
 		xlabel = 'IS2SITMOGR4 uncert'
 		ylabel = 'NESOSIM-MCMC SIT uncert'
-		
+		horiz_label = 'SIT uncert (m)'
+		vert_label = 'Number of grid cells'		
 		filename = '{}hist_is2_vs_mcmc_sit_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
-		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, range=[[0,1.2],[0,1.2]])
+		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, range=[[0,1.2],[0,1.2]])
+		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
+
 
 		# nesosim uncertainty calculated using p2020 vs. is2 uncertainty
 		x, y = sit_uncert_is2.values, uncert_previous
 		title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
 		xlabel = 'IS2SITMOGR4 uncert'
 		ylabel = 'NESOSIM-MCMC SIT uncert P2020'
-		
+		horiz_label = 'SIT uncert (m)'
+		vert_label = 'Number of grid cells'
 		filename = '{}hist_is2_vs_mcmc_p2020_sit_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
-		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, range=[[0,1.2],[0,1.2]])
+		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, range=[[0,1.2],[0,1.2]])
+		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
 
 
@@ -338,55 +365,74 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
 		xlabel = 'Ensemble uncertainty'
 		ylabel = 'Total uncertainty'
+		horiz_label = 'SIT uncert (m)'
+		vert_label = 'Number of grid cells'
 		filename = '{}hist_ensemble_vs_total_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
-		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
 		# snow-only vs ensemble uncertainty
 		x, y = ens_uncert.values, random_uncert_snow_only
 		title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
 		xlabel = 'Ensemble uncertainty'
 		ylabel = 'Snow-only uncertainty'
+		horiz_label = 'SIT uncert (m)'
+		vert_label = 'Number of grid cells'
 		filename = '{}hist_ensemble_vs_snow_only_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
-		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
-
+		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
 		# snow-only vs total uncertainty
 		x, y = random_uncert, random_uncert_snow_only
 		title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
 		xlabel = 'Total uncertainty'
 		ylabel = 'Snow-only uncertainty'
+		horiz_label = 'SIT uncert (m)'
+		vert_label = 'Number of grid cells'
 		filename = '{}hist_snow_only_vs_total_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
-		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
 		# ensemble vs. p2020 uncertainty
 		x, y = uncert_previous, ens_uncert.values
 		title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
 		xlabel = 'P2020 uncertainty'
 		ylabel = 'Ensemble uncertainty'
+		horiz_label = 'SIT uncert (m)'
+		vert_label = 'Number of grid cells'
 		filename = '{}hist_p2020_vs_ensemble_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
-		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
 		# total vs p2020 uncertainty
 		x, y = uncert_previous, random_uncert
 		title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
 		xlabel = 'P2020 uncertainty'
 		ylabel = 'Total uncertainty'
+		horiz_label = 'SIT uncert (m)'
+		vert_label = 'Number of grid cells'
 		filename = '{}hist_p2020_vs_total_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
-		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
+
 
 		# snow-only vs p2020 uncertainty
 		x, y = uncert_previous, random_uncert_snow_only
 		title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
 		xlabel = 'P2020 uncertainty'
 		ylabel = 'Snow-only uncertainty'
+		horiz_label = 'SIT uncert (m)'
+		vert_label = 'Number of grid cells'
 		filename = '{}hist_p2020_vs_snow_only_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
-		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
+
 
 
 if MAKE_SNOW_DEPTH_DENS_PLOTS:
