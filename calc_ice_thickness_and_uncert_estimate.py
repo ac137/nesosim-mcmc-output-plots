@@ -73,16 +73,16 @@ def plot_nan_masked_hist_1d(data1, data2, title, data1_name, data2_name, filenam
 
 	# todo: marginal axes? adjust colormap, etc.
 
-	mask = ~np.isnan(x) & ~np.isnan(y)
+	mask = ~np.isnan(data1) & ~np.isnan(data2)
 
 	plt.figure(dpi=200)
-	plt.hist(x[mask].flatten(),bins=nbins, alpha=alpha, label=xlabel, **kwargs)
-	plt.hist(y[mask].flatten(),bins=nbins, alpha=alpha, label=ylabel, **kwargs)
+	plt.hist(data1[mask].flatten(),bins=nbins, alpha=alpha, label=data1_name, **kwargs)
+	plt.hist(data2[mask].flatten(),bins=nbins, alpha=alpha, label=data2_name, **kwargs)
 	plt.title(title)
 	plt.ylabel(ylabel)
 	plt.xlabel(xlabel)
-	plt.colorbar()
-	fn2 = '1d_' + filename
+	plt.legend()
+	fn2 = filename
 	plt.savefig(fn2)
 
 
