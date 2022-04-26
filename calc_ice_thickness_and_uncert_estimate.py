@@ -10,6 +10,7 @@ import xarray as xr
 import os
 import pandas as pd
 import cartopy.crs as ccrs
+import seaborn as sns
 
 
 
@@ -54,15 +55,38 @@ def plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, nbins=20, cmap='
 
 	# todo: marginal axes? adjust colormap, etc.
 
+	sns.set_theme(style="white")
+	sns.set_context("talk")
+
 	mask = ~np.isnan(x) & ~np.isnan(y)
 
-	plt.figure(dpi=200)
+	# plt.figure(dpi=200)
+	# sns.jointplot(x[mask].flatten(), y[mask].flatten(), color='m')
+	histplot = sns.jointplot(x[mask].flatten(), y[mask].flatten(), kind="hist",bins=nbins, cbar=True,marginal_ticks=False, color='m',space=0.4,marginal_kws=dict(bins=nbins),cbar_kws=dict(label='Count'))#,cmap='viridis')#,cbar_kws = dict(use_gridspec=False,location="bottom"))
 
-	plt.hist2d(x[mask].flatten(), y[mask].flatten(),bins=nbins, cmap=cmap, **kwargs)
-	plt.title(title)
-	plt.xlabel(xlabel)
-	plt.ylabel(ylabel)
-	plt.colorbar()
+	plt.subplots_adjust(left=0.1, right=0.8, top=0.9, bottom=0.1)
+	# get the current positions of the joint ax and the ax for the marginal x
+	pos_joint_ax = histplot.ax_joint.get_position()
+	pos_marg_x_ax = histplot.ax_marg_x.get_position()
+	# reposition the joint ax so it has the same width as the marginal x ax
+	histplot.ax_joint.set_position([pos_joint_ax.x0, pos_joint_ax.y0, pos_marg_x_ax.width, pos_joint_ax.height])
+	# reposition the colorbar using new x positions and y positions of the joint ax
+	histplot.fig.axes[-1].set_position([.83, pos_joint_ax.y0, .07, pos_joint_ax.height])
+	# plt.tight_layout()
+	histplot.ax_marg_y.tick_params(labelleft=False)
+	histplot.ax_marg_x.tick_params(labelbottom=False)
+	sns.despine(left=True, bottom=True)# offset=20)
+	# sns.despine(offset=40)
+
+	histplot.set_axis_labels(xlabel, ylabel)
+
+
+
+	# # plt.hist2d(x[mask].flatten(), y[mask].flatten(),bins=nbins, color='m', **kwargs)
+	# plt.title(title)
+	# plt.xlabel(xlabel)
+	# plt.ylabel(ylabel)
+	# plt.colorbar()
 	plt.savefig(filename)
 
 def plot_nan_masked_hist_1d(data1, data2, title, data1_name, data2_name, filename, xlabel, ylabel, nbins=20, alpha=0.7,**kwargs):
@@ -283,8 +307,8 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		
 		filename = '{}hist_is2_vs_mcmc_sit_{}_{}.png'.format(fig_path, data_flag, monthday)
 
-		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
-		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
+		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
 
 		# plot is2 map
@@ -334,7 +358,9 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		filename = '{}hist_is2_vs_mcmc_sit_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
 		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, range=[[0,1.2],[0,1.2]])
-		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
+		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+
+		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
 
 		# nesosim uncertainty calculated using p2020 vs. is2 uncertainty
@@ -347,7 +373,9 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		filename = '{}hist_is2_vs_mcmc_p2020_sit_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
 		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, range=[[0,1.2],[0,1.2]])
-		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
+		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+
+		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
 
 
@@ -369,8 +397,8 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		vert_label = 'Number of grid cells'
 		filename = '{}hist_ensemble_vs_total_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
-		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
-		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
+		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
 		# snow-only vs ensemble uncertainty
 		x, y = ens_uncert.values, random_uncert_snow_only
@@ -381,8 +409,8 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		vert_label = 'Number of grid cells'
 		filename = '{}hist_ensemble_vs_snow_only_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
-		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
-		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
+		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
 		# snow-only vs total uncertainty
 		x, y = random_uncert, random_uncert_snow_only
@@ -393,8 +421,8 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		vert_label = 'Number of grid cells'
 		filename = '{}hist_snow_only_vs_total_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
-		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
-		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
+		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
 		# ensemble vs. p2020 uncertainty
 		x, y = uncert_previous, ens_uncert.values
@@ -405,8 +433,8 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		vert_label = 'Number of grid cells'
 		filename = '{}hist_p2020_vs_ensemble_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
-		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
-		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
+		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
 		# total vs p2020 uncertainty
 		x, y = uncert_previous, random_uncert
@@ -417,8 +445,8 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		vert_label = 'Number of grid cells'
 		filename = '{}hist_p2020_vs_total_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
-		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
-		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
+		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
 
 		# snow-only vs p2020 uncertainty
@@ -430,8 +458,8 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		vert_label = 'Number of grid cells'
 		filename = '{}hist_p2020_vs_snow_only_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
-		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
-		plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
+		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
 
 
