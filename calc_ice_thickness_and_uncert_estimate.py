@@ -294,16 +294,19 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		sit_is2 = xr.open_dataset('gridded_sit_{}.nc'.format(monthday))['sit'][0,:,:]
 
 		sit_uncert_is2 = xr.open_dataset('gridded_sit_{}.nc'.format(monthday))['sit uncertainty'][0,:,:]
-		sea_ice_thickness[sea_ice_thickness < 0] = np.nan
-		random_uncert[sea_ice_thickness < 0] = np.nan
+		sit_lto = sea_ice_thickness < 0
+		random_uncert[sit_lto] = np.nan
+
+		sea_ice_thickness[sit_lto] = np.nan
+		random_uncert[sit_lto] = np.nan
 
 		# gridded_sit_2019-03.nc
 		# correlate sit and uncertainty plots
 
 		x, y = sit_is2.values, sea_ice_thickness
-		title = 'SIT comparison for {} (m)'.format(monthday)
-		xlabel = 'IS2SITMOGR4'
-		ylabel = 'NESOSIM-MCMC SIT'
+		title = 'SIT comparison for {}'.format(monthday)
+		xlabel = 'IS2SITMOGR4 (m)'
+		ylabel = 'NESOSIM-MCMC SIT (m)'
 		horiz_label = 'SIT (m)'
 		vert_label = 'Number of grid cells'
 		
@@ -352,9 +355,9 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
 		# nesosim uncertainty vs is2 uncertainty
 		x, y = sit_uncert_is2.values, random_uncert
-		title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
-		xlabel = 'IS2SITMOGR4 uncert'
-		ylabel = 'NESOSIM-MCMC SIT uncert'
+		title = 'SIT uncertainty comparison for {}'.format(monthday)
+		xlabel = 'IS2SITMOGR4 uncert (m)'
+		ylabel = 'NESOSIM-MCMC SIT uncert (m)'
 		horiz_label = 'SIT uncert (m)'
 		vert_label = 'Number of grid cells'		
 		filename = '{}hist_is2_vs_mcmc_sit_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
@@ -367,9 +370,9 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
 		# nesosim uncertainty calculated using p2020 vs. is2 uncertainty
 		x, y = sit_uncert_is2.values, uncert_previous
-		title = 'SIT uncertainty comparison for {} (m)'.format(monthday)
-		xlabel = 'IS2SITMOGR4 uncert'
-		ylabel = 'NESOSIM-MCMC SIT uncert P2020'
+		title = 'SIT uncertainty comparison for {}'.format(monthday)
+		xlabel = 'IS2SITMOGR4 uncert (m)'
+		ylabel = 'NESOSIM-MCMC SIT uncert P2020 (m)'
 		horiz_label = 'SIT uncert (m)'
 		vert_label = 'Number of grid cells'
 		filename = '{}hist_is2_vs_mcmc_p2020_sit_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
@@ -381,9 +384,10 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
 		# sea ice thickness vs snow depth correlation
 		x, y = h_s, sea_ice_thickness
-		title = 'SIT-snow correlation for {} (m)'.format(monthday)
-		xlabel = 'NESOSIM-MCMC snow depth'
-		ylabel = 'NESOSIM-MCMC SIT'
+		
+		title = 'SIT-snow correlation for {}'.format(monthday)
+		xlabel = 'NESOSIM-MCMC snow depth (m)'
+		ylabel = 'NESOSIM-MCMC SIT (m)'
 		
 		filename = '{}hist_hs_vs_mcmc_sit_{}_{}.png'.format(fig_path, data_flag, monthday)
 
@@ -392,11 +396,14 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
 		# snow vs freeboard correlation
 		x,y = h_s, h_f
-		title = 'Freeboard-snow correlation for {} (m)'.format(monthday)
-		xlabel = 'NESOSIM-MCMC snow depth'
-		ylabel = 'IS2 ATL20 freeboard'
+		x[sit_lto] = np.nan
+		title = 'Freeboard-snow correlation for {}'.format(monthday)
+		xlabel = 'NESOSIM-MCMC snow depth (m)'
+		ylabel = 'IS2 ATL20 freeboard (m)'
 		
 		filename = '{}hist_hs_vs_freeboard_{}_{}.png'.format(fig_path, data_flag, monthday)
+		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		
 
 
 	if MAKE_UNCERT_CORREL_PLOTS:
