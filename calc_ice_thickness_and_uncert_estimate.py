@@ -29,7 +29,7 @@ def plot_map(var, lons, lats, title, filename, sic, cmap='Blues', **kwargs):
 	ax.pcolormesh(lons,lats,sic*0.3, transform=proj_coord, shading='flat', cmap="Greys",vmin=0,vmax=1, label='SIC >= 0.5')
 	pcm = ax.pcolormesh(lons,lats,var,transform=proj_coord,shading='flat', cmap=cmap, **kwargs) # using flat shading avoids artefacts
 	ax.coastlines(zorder=3)
-	ax.gridlines(draw_labels=True,
+	ax.gridlines(draw_labels=False,
 	          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
 
 	# for some reason this extent complains if you set set -180 to +180
@@ -46,7 +46,7 @@ def plot_map(var, lons, lats, title, filename, sic, cmap='Blues', **kwargs):
 	plt.savefig(filename)
 
 
-def plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, nbins=20, **kwargs):
+def plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, nbins=20, cmap='Blues', **kwargs):
 	''' assumes x and y are unflattened nd arrays (same shape/size)
 	title, xlabel, ylabel, filename are str for plot labels
 	masks out nan values
@@ -58,7 +58,7 @@ def plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, nbins=20, **kwar
 
 	plt.figure(dpi=200)
 
-	plt.hist2d(x[mask].flatten(), y[mask].flatten(),bins=nbins, **kwargs)
+	plt.hist2d(x[mask].flatten(), y[mask].flatten(),bins=nbins, cmap=cmap, **kwargs)
 	plt.title(title)
 	plt.xlabel(xlabel)
 	plt.ylabel(ylabel)
@@ -71,7 +71,9 @@ def plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, nbins=20, **kwar
 # which plots to make (to avoid excessive re-running)
 MAKE_MAP_PLOTS = True# plot maps of uncertainty for the month
 MAKE_SIT_CORREL_PLOTS = True# plot correlation between nesosim-mcmc and regridded is2 product sit
-MAKE_UNCERT_CORREL_PLOTS = False# plot correlation plots of the uncertainties
+MAKE_UNCERT_CORREL_PLOTS = True# plot correlation plots of the uncertainties
+
+MAKE_SNOW_DEPTH_DENS_PLOTS = False
 
 
 
@@ -248,6 +250,8 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		sit_is2 = xr.open_dataset('gridded_sit_{}.nc'.format(monthday))['sit'][0,:,:]
 
 		sit_uncert_is2 = xr.open_dataset('gridded_sit_{}.nc'.format(monthday))['sit uncertainty'][0,:,:]
+		sea_ice_thickness[sea_ice_thickness < 0] = np.nan
+		random_uncert[sea_ice_thickness < 0] = np.nan
 
 		# gridded_sit_2019-03.nc
 		# correlate sit and uncertainty plots
@@ -270,19 +274,19 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=0, vmax=5)
 
 		# difference between is2 sit and nesosim-mcmc sit
-		var = sit_is2.values - sea_ice_thickness # sit value difference
+		var = sea_ice_thickness - sit_is2.values # sit value difference
 		lons = nesosim_data['longitude'] # same lat and lon used everywhere 
 		lats = nesosim_data['latitude']
-		title = 'IS2 - NESOSIM-MCMC SIT difference for {} (m)'.format(monthday)
+		title = 'NESOSIM-MCMC - IS2 SIT difference for {} (m)'.format(monthday)
 		filename = '{}mcmc-is2-diff-map_{}_{}.png'.format(fig_path, data_flag, monthday)
 		plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=-4, vmax=4, cmap='RdBu')
 
 
 		# difference between is2 uncertainty and nesosim-mcmc uncertainty
-		var = sit_uncert_is2.values - random_uncert # uncertainty value difference
+		var = random_uncert - sit_uncert_is2.values # uncertainty value difference
 		lons = nesosim_data['longitude'] 
 		lats = nesosim_data['latitude']
-		title = 'IS2 - NESOSIM-MCMC SIT uncert difference for {} (m)'.format(monthday)
+		title = 'NESOSIM-MCMC - IS2 SIT uncert difference for {} (m)'.format(monthday)
 		filename = '{}mcmc-is2-uncert-diff-map_{}_{}.png'.format(fig_path, data_flag, monthday)
 
 		plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=-1,vmax=1,cmap='RdBu')
@@ -383,3 +387,38 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		filename = '{}hist_p2020_vs_snow_only_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
 		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+
+
+if MAKE_SNOW_DEPTH_DENS_PLOTS:
+	lons = nesosim_data['longitude'] # same lat and lon used everywhere I think
+	lats = nesosim_data['latitude']
+
+
+	
+
+	# snow depth
+	var = h_s
+	# mask out where sit is unphysical
+	var[sea_ice_thickness < 0] = np.nan
+	title = 'NESOSIM-MCMC snow depth for {} (m)'.format(monthday)
+	filename = '{}snow_depth_map_{}_{}.png'.format(fig_path,data_flag,monthday)
+	plot_map(var, lons, lats, title, filename, ice_mask_idx,vmax=1.)
+
+	var = r_s
+	var[sea_ice_thickness < 0] = np.nan
+	title = 'NESOSIM-MCMC snow density for {} (kg/m^3)'.format(monthday)
+	filename = '{}snow_density_map_{}_{}.png'.format(fig_path, data_flag, monthday)
+	plot_map(var, lons, lats, title, filename, ice_mask_idx)
+	
+	var = e_h_s
+	var[sea_ice_thickness < 0] = np.nan
+	title = 'NESOSIM-MCMC snow depth uncert. for {} (m)'.format(monthday)
+	filename = '{}snow_depth_unc_map_{}_{}.png'.format(fig_path, data_flag, monthday)
+	plot_map(var, lons, lats, title, filename, ice_mask_idx)
+	
+	var = e_r_s
+	var[sea_ice_thickness < 0] = np.nan
+	title = 'NESOSIM-MCMC snow density uncert. for {} (kg/m^3)'.format(monthday)
+	filename = '{}snow_density_unc_map_{}_{}.png'.format(fig_path, data_flag, monthday)
+	plot_map(var, lons, lats, title, filename, ice_mask_idx)
+	
