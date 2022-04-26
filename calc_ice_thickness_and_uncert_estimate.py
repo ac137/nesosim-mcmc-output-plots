@@ -115,7 +115,7 @@ def plot_nan_masked_hist_1d(data1, data2, title, data1_name, data2_name, filenam
 # which plots to make (to avoid excessive re-running)
 MAKE_MAP_PLOTS = False# plot maps of uncertainty for the month
 MAKE_SIT_CORREL_PLOTS = True# plot correlation between nesosim-mcmc and regridded is2 product sit
-MAKE_UNCERT_CORREL_PLOTS = True# plot correlation plots of the uncertainties
+MAKE_UNCERT_CORREL_PLOTS = False# plot correlation plots of the uncertainties
 
 MAKE_SNOW_DEPTH_DENS_PLOTS = False
 
@@ -379,7 +379,24 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
 		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
+		# sea ice thickness vs snow depth correlation
+		x, y = h_s, sea_ice_thickness
+		title = 'SIT-snow correlation for {} (m)'.format(monthday)
+		xlabel = 'NESOSIM-MCMC snow depth'
+		ylabel = 'NESOSIM-MCMC SIT'
+		
+		filename = '{}hist_hs_vs_mcmc_sit_{}_{}.png'.format(fig_path, data_flag, monthday)
 
+		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+
+
+		# snow vs freeboard correlation
+		x,y = h_s, h_f
+		title = 'Freeboard-snow correlation for {} (m)'.format(monthday)
+		xlabel = 'NESOSIM-MCMC snow depth'
+		ylabel = 'IS2 ATL20 freeboard'
+		
+		filename = '{}hist_hs_vs_freeboard_{}_{}.png'.format(fig_path, data_flag, monthday)
 
 
 	if MAKE_UNCERT_CORREL_PLOTS:
