@@ -163,6 +163,8 @@ val_dict['ehs'] = []
 val_dict['sit_mcmc'] = []
 val_dict['sit_is2'] = []
 val_dict['month'] = []
+val_dict['e_sit_mcmc'] = []
+val_dict['e_sit_is2'] = []
 
 for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
@@ -617,19 +619,48 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		e_h_s[lto] = np.nan
 		sit_is2.values[lto] = np.nan
 		sea_ice_thickness[lto] = np.nan
+		random_uncert[lto] = np.nan
+		sit_uncert_is2.values[lto] = np.nan
+
 		
 		val_dict['month'].append(monthday)
 		val_dict['hs'].append(h_s.flatten())
 		val_dict['ehs'].append(e_h_s.flatten())
 		val_dict['sit_mcmc'].append(sea_ice_thickness.flatten())
 		val_dict['sit_is2'].append(sit_is2.values.flatten())
+		val_dict['e_sit_mcmc'].append(random_uncert.flatten())
+		val_dict['e_sit_is2'].append(sit_uncert_is2.values.flatten())
+
 
 
 if MAKE_BOX_PLOTS:
 	df1 = pd.DataFrame(np.array(val_dict['sit_mcmc']).transpose(),columns=val_dict['month'])
 	df1 = df1.stack()
-	df1.rename('MCMC',inplace=True)
+	df1.rename('MCMC',inplace=True) #is the renaming redundant?
 	df2 = pd.DataFrame(np.array(val_dict['sit_is2']).transpose(),columns=val_dict['month'])
+	df2 = df2.stack()
+	df2.rename('IS2',inplace=True)
+	
+
+	df = pd.concat([df1, df2],keys=['MCMC','IS2'], axis=0).reset_index()
+
+	df.columns = ['Product','idx','Month','value']
+
+	plt.figure(dpi=200)
+	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='crest',split=True) 
+
+	plt.xticks(ticks=range(len(val_dict['month'])), labels=val_dict['month'])
+	plt.legend(loc='upper center')
+	plt.ylabel('Sea ice thickness (m)')
+	plt.title('Monthly sea ice thickness spatial distribution')
+	plt.savefig('{}sit_mcmc_plot_violin_{}.png'.format(fig_path, data_flag))
+
+
+
+	df1 = pd.DataFrame(np.array(val_dict['e_sit_mcmc']).transpose(),columns=val_dict['month'])
+	df1 = df1.stack()
+	df1.rename('MCMC',inplace=True)
+	df2 = pd.DataFrame(np.array(val_dict['e_sit_is2']).transpose(),columns=val_dict['month'])
 	df2 = df2.stack()
 	df2.rename('IS2',inplace=True)
 	
@@ -650,6 +681,6 @@ if MAKE_BOX_PLOTS:
 	#sns.stripplot(data=val_dict['sit_mcmc'],size=4, color=".3", linewidth=1, alpha=0.6, jitter=0.35,marker='x')
 	plt.xticks(ticks=range(len(val_dict['month'])), labels=val_dict['month'])
 	plt.legend(loc='upper center')
-	plt.ylabel('Sea ice thickness (m)')
-	plt.title('Monthly sea ice thickness spatial distribution')
-	plt.savefig('{}sit_mcmc_plot_{}.png'.format(fig_path, data_flag))
+	plt.ylabel('Sea ice thickness uncertainty (m)')
+	plt.title('Monthly sea ice thickness uncert spatial distribution')
+	plt.savefig('{}sit_uncert_mcmc_plot_violin_{}.png'.format(fig_path, data_flag))
