@@ -612,6 +612,12 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		# can disentangle later if necessary (but sticking to oib detailed for the moment)
 
 		# add flattened values
+		lto = sea_ice_thickness < 0
+		h_s[lto] = np.nan
+		e_h_s[lto] = np.nan
+		sit_is2.values[lto] = np.nan
+		sea_ice_thickness[lto] = np.nan
+		
 		val_dict['month'].append(monthday)
 		val_dict['hs'].append(h_s.flatten())
 		val_dict['ehs'].append(e_h_s.flatten())
@@ -620,12 +626,30 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
 
 if MAKE_BOX_PLOTS:
+	df1 = pd.DataFrame(np.array(val_dict['sit_mcmc']).transpose(),columns=val_dict['month'])
+	df1 = df1.stack()
+	df1.rename('MCMC',inplace=True)
+	df2 = pd.DataFrame(np.array(val_dict['sit_is2']).transpose(),columns=val_dict['month'])
+	df2 = df2.stack()
+	df2.rename('IS2',inplace=True)
+	
 
+	df = pd.concat([df1, df2],keys=['MCMC','IS2'], axis=0).reset_index()
+#	df.columns = ['date','value']
+
+	print(df)
+	df.columns = ['Product','idx','Month','value']
 	# create dataframe?
 	# sns.boxplot(x=val_dict['month'],data=val_dict['sit_mcmc'])
+	plt.figure(dpi=200)
 
-	sns.boxplot(data=val_dict['sit_mcmc'], palette='crest')
-	sns.stripplot(data=val_dict['sit_mcmc'],
-	              size=4, color=".3", linewidth=0)
-	plt.xticks(ticks=range(len(val_dict['month']), labels=val_dict['month'])
-	plt.show()
+	#sns.boxplot(data=val_dict['sit_mcmc'], palette='crest',showfliers=False)
+#	sns.violinplot(data=val_dict['sit_mcmc'], palette='crest')#,showfliers=False)
+#	sns.violinplot(data=val_dict['sit_is2'],palette='crest')
+	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='crest',split=True) 
+	#sns.stripplot(data=val_dict['sit_mcmc'],size=4, color=".3", linewidth=1, alpha=0.6, jitter=0.35,marker='x')
+	plt.xticks(ticks=range(len(val_dict['month'])), labels=val_dict['month'])
+	plt.legend(loc='upper center')
+	plt.ylabel('Sea ice thickness (m)')
+	plt.title('Monthly sea ice thickness spatial distribution')
+	plt.savefig('{}sit_mcmc_plot_{}.png'.format(fig_path, data_flag))
