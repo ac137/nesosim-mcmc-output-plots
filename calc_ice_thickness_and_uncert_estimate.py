@@ -554,5 +554,39 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
 		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=np.linspace(0,1,20))
 
+
+		var = e_h_s
+		var[sea_ice_thickness < 0] = np.nan
+		title = 'NESOSIM-MCMC snow depth uncert. distribution for {} (m)'.format(monthday)
+		filename = '{}snow_depth_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+
+		xlabel = 'Snow depth uncert (m)'
+		ylabel = 'Count'
+
+		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)#np.linspace(0,1,20))
+
+
+		var = sea_ice_thickness # sit
+		# mask out where sit is unphysical
+		var[sea_ice_thickness < 0] = np.nan
+
+		title = 'NESOSIM-MCMC SIT distribution for {}'.format(monthday)
+		filename = '{}sit_distribution_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+
+		# should I normalize these??
+		xlabel = 'Sea ice thickness (m)'
+		ylabel = 'Count'
+
+		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)#, bins=np.linspace(0,1,20))
+
 		
 
+		var = random_uncert
+		var[sea_ice_thickness < 0] = np.nan
+		title = 'NESOSIM-MCMC SIT uncert distribution for {}'.format(monthday)
+
+		filename = '{}sit_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+
+		xlabel = 'Sea ice thickness uncert (m)'
+		ylabel = 'Count'
+		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)#, bins=np.linspace(0,1,20))
