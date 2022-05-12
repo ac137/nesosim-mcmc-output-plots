@@ -20,6 +20,7 @@ def plot_map(var, lons, lats, title, filename, sic, cmap='Blues', **kwargs):
 	sic is a 2d array of sea ice concentration (binary mask?)
 	kwargs are for pcolormesh (eg. vmin, vmax, cmap, etc.)
 	'''
+	matplotlib.rcParams.update(matplotlib.rcParamsDefault)
 	proj=ccrs.NorthPolarStereo(central_longitude=-45)
 	proj_coord = ccrs.PlateCarree()
 
@@ -47,7 +48,7 @@ def plot_map(var, lons, lats, title, filename, sic, cmap='Blues', **kwargs):
 	plt.savefig(filename)
 
 
-def plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, nbins=20, cmap='Blues', **kwargs):
+def plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, nbins=20, cmap='Blues', color='m',**kwargs):
 	''' assumes x and y are unflattened nd arrays (same shape/size)
 	title, xlabel, ylabel, filename are str for plot labels
 	masks out nan values
@@ -62,7 +63,7 @@ def plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, nbins=20, cmap='
 
 	# plt.figure(dpi=200)
 	# sns.jointplot(x[mask].flatten(), y[mask].flatten(), color='m')
-	histplot = sns.jointplot(x[mask].flatten(), y[mask].flatten(), kind="hist",bins=nbins, cbar=True,marginal_ticks=False, color='m',space=0.4,marginal_kws=dict(bins=nbins,**kwargs),cbar_kws=dict(label='Count'),**kwargs)#,cmap='viridis')#,cbar_kws = dict(use_gridspec=False,location="bottom"))
+	histplot = sns.jointplot(x[mask].flatten(), y[mask].flatten(), kind="hist",bins=nbins, cbar=True,marginal_ticks=False, color=color,space=0.4,marginal_kws=dict(bins=nbins,**kwargs),cbar_kws=dict(label='Count'),**kwargs)#,cmap='viridis')#,cbar_kws = dict(use_gridspec=False,location="bottom"))
 
 	plt.subplots_adjust(left=0.1, right=0.8, top=0.9, bottom=0.1)
 	# get the current positions of the joint ax and the ax for the marginal x
@@ -114,10 +115,10 @@ def plot_nan_masked_hist_1d(data1, data2, title, data1_name, data2_name, filenam
 
 # which plots to make (to avoid excessive re-running)
 MAKE_MAP_PLOTS = False# plot maps of uncertainty for the month
-MAKE_SIT_CORREL_PLOTS = True# plot correlation between nesosim-mcmc and regridded is2 product sit
-MAKE_UNCERT_CORREL_PLOTS = False# plot correlation plots of the uncertainties
+MAKE_SIT_CORREL_PLOTS = False# plot nesosim-mcmc and regridded is2 product sit
+MAKE_UNCERT_CORREL_PLOTS = False# plot comparison plots of the uncertainties
 
-MAKE_SNOW_DEPTH_DENS_PLOTS = False
+MAKE_SNOW_DEPTH_DENS_PLOTS =True 
 
 
 
@@ -133,9 +134,10 @@ MAKE_SNOW_DEPTH_DENS_PLOTS = False
 
 
 # data_flag_list = ['oib_averaged', 'oib_detailed']
-# date_list = ['2018-11', '2019-01', '2019-03']
+date_list = ['2018-11', '2019-01', '2019-03']
 
 data_flag_list = ['oib_detailed']
+#date_list = ['2018-11', '2019-01']
 date_list = ['2019-03']
 
 # big for loop? iterate over data_flag and monthday
@@ -255,14 +257,14 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		var = sea_ice_thickness 
 		title = 'Sea ice thickness for {} (m)'.format(monthday)
 		filename = '{}sea_ice_thickness_estimate_{}_{}.png'.format(fig_path,data_flag,monthday)
-		plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=0, vmax=5)
+		plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=0, vmax=5, cmap='Purples')
 
 
 		# sea ice thickness unertainty from NESOSIM-mcmc using uncertainty formula
 		var = random_uncert
 		title = 'Sea ice thickness uncertainty for {} (m)'.format(monthday)
 		filename = '{}sea_ice_thickness_uncert_{}_{}.png'.format(fig_path,data_flag, monthday)
-		plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=0, vmax=0.7)
+		plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=0, vmax=0.7, cmap='Greens')
 
 		# 'snow only' sea ice thickness uncertainty (exclude contribution from other terms)
 		var = random_uncert_snow_only
@@ -288,7 +290,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
 
 	if MAKE_SIT_CORREL_PLOTS:
-		print('plotting is2 correlation plots')
+		print('plotting is2 comparison plots')
 
 		# load gridded is2 plots (provided by gridIS2thickness.py)
 		sit_is2 = xr.open_dataset('gridded_sit_{}.nc'.format(monthday))['sit'][0,:,:]
@@ -301,7 +303,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		random_uncert[sit_lto] = np.nan
 
 		# gridded_sit_2019-03.nc
-		# correlate sit and uncertainty plots
+		# compare sit and uncertainty plots
 
 		x, y = sit_is2.values, sea_ice_thickness
 		title = 'SIT comparison for {}'.format(monthday)
@@ -363,7 +365,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		filename = '{}hist_is2_vs_mcmc_sit_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
 		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, range=[[0,1.2],[0,1.2]])
-		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename,binrange=[0,1.2])#,xlim=(0,1.2),ylim=(0,1.2))
+		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename,binrange=[0,1.2],color='g')#,xlim=(0,1.2),ylim=(0,1.2))
 
 		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
@@ -382,10 +384,10 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
 		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
-		# sea ice thickness vs snow depth correlation
+		# sea ice thickness vs snow depth 
 		x, y = h_s, sea_ice_thickness
 		
-		title = 'SIT-snow correlation for {}'.format(monthday)
+		title = 'SIT vs snow for {}'.format(monthday)
 		xlabel = 'NESOSIM-MCMC snow depth (m)'
 		ylabel = 'NESOSIM-MCMC SIT (m)'
 		
@@ -394,21 +396,21 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
 
 
-		# snow vs freeboard correlation
+		# snow vs freeboard 
 		x,y = h_s, h_f
 		x[sit_lto] = np.nan
-		title = 'Freeboard-snow correlation for {}'.format(monthday)
+		title = 'Freeboard vs snow for {}'.format(monthday)
 		xlabel = 'NESOSIM-MCMC snow depth (m)'
 		ylabel = 'IS2 ATL20 freeboard (m)'
 		
 		filename = '{}hist_hs_vs_freeboard_{}_{}.png'.format(fig_path, data_flag, monthday)
-		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
+		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename,color='c')
 		
 
 
 	if MAKE_UNCERT_CORREL_PLOTS:
 
-		print('plotting nesosim uncertainty correlation plots')
+		print('plotting nesosim uncertainty comparison plots')
 
 		# load calculated ensemble uncertainty (provided by calc_ice_thickness_uncert_ensemble.py)
 		ens_uncert = xr.open_dataarray('sit_uncert_ensemble_{}.nc'.format(ens_data_flag))
@@ -502,13 +504,13 @@ if MAKE_SNOW_DEPTH_DENS_PLOTS:
 	var[sea_ice_thickness < 0] = np.nan
 	title = 'NESOSIM-MCMC snow depth for {} (m)'.format(monthday)
 	filename = '{}snow_depth_map_{}_{}.png'.format(fig_path,data_flag,monthday)
-	plot_map(var, lons, lats, title, filename, ice_mask_idx,vmax=1.)
+	plot_map(var, lons, lats, title, filename, ice_mask_idx,vmax=0.6)
 
 	var = r_s
 	var[sea_ice_thickness < 0] = np.nan
 	title = 'NESOSIM-MCMC snow density for {} (kg/m^3)'.format(monthday)
 	filename = '{}snow_density_map_{}_{}.png'.format(fig_path, data_flag, monthday)
-	plot_map(var, lons, lats, title, filename, ice_mask_idx)
+	plot_map(var, lons, lats, title, filename, ice_mask_idx,vmin=300,cmap='YlOrBr')
 	
 	var = e_h_s
 	var[sea_ice_thickness < 0] = np.nan
