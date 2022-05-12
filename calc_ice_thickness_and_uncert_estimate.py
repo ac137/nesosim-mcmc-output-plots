@@ -130,8 +130,8 @@ MAKE_MAP_PLOTS = False# plot maps of uncertainty for the month
 MAKE_SIT_CORREL_PLOTS = False# plot nesosim-mcmc and regridded is2 product sit
 MAKE_UNCERT_CORREL_PLOTS = False# plot comparison plots of the uncertainties
 MAKE_SNOW_DEPTH_DENS_PLOTS = False 
-MAKE_1D_HIST_PLOTS = True
-
+MAKE_1D_HIST_PLOTS = False
+MAKE_BOX_PLOTS = True
 
 
 # estimate based on retrieval in Petty et al 2020
@@ -155,7 +155,19 @@ data_flag_list = ['oib_detailed']
 # big for loop? iterate over data_flag and monthday
 # data_flag is no longer a constant I guess
 
+# dictionary for collecting values
+
+val_dict = {}
+val_dict['hs'] = []
+val_dict['ehs'] = []
+val_dict['sit_mcmc'] = []
+val_dict['sit_is2'] = []
+val_dict['month'] = []
+
 for data_flag, monthday in itertools.product(data_flag_list, date_list):
+
+
+
 
 	print('making plots for {} in {}'.format(data_flag, monthday))
 
@@ -300,14 +312,16 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
 	ens_data_flag = '{}_ensemble_uncert'.format(data_flag)
 
+	# load is2 sea ice thickness
+	sit_is2 = xr.open_dataset('gridded_sit_{}.nc'.format(monthday))['sit'][0,:,:]
+
+	sit_uncert_is2 = xr.open_dataset('gridded_sit_{}.nc'.format(monthday))['sit uncertainty'][0,:,:]
 
 	if MAKE_SIT_CORREL_PLOTS:
 		print('plotting is2 comparison plots')
 
 		# load gridded is2 plots (provided by gridIS2thickness.py)
-		sit_is2 = xr.open_dataset('gridded_sit_{}.nc'.format(monthday))['sit'][0,:,:]
-
-		sit_uncert_is2 = xr.open_dataset('gridded_sit_{}.nc'.format(monthday))['sit uncertainty'][0,:,:]
+		
 		sit_lto = sea_ice_thickness < 0
 		random_uncert[sit_lto] = np.nan
 
@@ -590,3 +604,28 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		xlabel = 'Sea ice thickness uncert (m)'
 		ylabel = 'Count'
 		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)#, bins=np.linspace(0,1,20))
+
+	if MAKE_BOX_PLOTS:
+		# collect values
+
+		# assuming doing this only for either oib averaged or oib detailed for now;
+		# can disentangle later if necessary (but sticking to oib detailed for the moment)
+
+		# add flattened values
+		val_dict['month'].append(monthday)
+		val_dict['hs'].append(h_s.flatten())
+		val_dict['ehs'].append(e_h_s.flatten())
+		val_dict['sit_mcmc'].append(sea_ice_thickness.flatten())
+		val_dict['sit_is2'].append(sit_is2.values.flatten())
+
+
+if MAKE_BOX_PLOTS:
+
+	# create dataframe?
+	# sns.boxplot(x=val_dict['month'],data=val_dict['sit_mcmc'])
+
+	sns.boxplot(data=val_dict['sit_mcmc'], palette='crest')
+	sns.stripplot(data=val_dict['sit_mcmc'],
+	              size=4, color=".3", linewidth=0)
+	plt.xticks(ticks=range(len(val_dict['month']), labels=val_dict['month'])
+	plt.show()
