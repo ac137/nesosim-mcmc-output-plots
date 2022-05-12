@@ -552,7 +552,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		xlabel = 'Snow depth (m)'
 		ylabel = 'Count'
 
-		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)
+		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=np.linspace(0,1,20))
 
 		
 
