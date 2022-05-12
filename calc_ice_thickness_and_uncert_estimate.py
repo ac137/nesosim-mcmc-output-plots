@@ -113,12 +113,24 @@ def plot_nan_masked_hist_1d(data1, data2, title, data1_name, data2_name, filenam
 	plt.savefig(fn2)
 
 
+def plot_single_hist(data, title, filename, xlabel, ylabel, bins=20, **kwargs):
+	'''plot a histogram for a single value'''
+
+	matplotlib.rcParams.update(matplotlib.rcParamsDefault)
+	plt.figure(dpi=200)
+	plt.hist(data, bins=bins, **kwargs)
+	plt.title(title)
+	plt.ylabel(ylabel)
+	plt.xlabel(xlabel)
+	plt.savefig(filename)
+
+
 # which plots to make (to avoid excessive re-running)
 MAKE_MAP_PLOTS = False# plot maps of uncertainty for the month
 MAKE_SIT_CORREL_PLOTS = False# plot nesosim-mcmc and regridded is2 product sit
 MAKE_UNCERT_CORREL_PLOTS = False# plot comparison plots of the uncertainties
-
-MAKE_SNOW_DEPTH_DENS_PLOTS =True 
+MAKE_SNOW_DEPTH_DENS_PLOTS = False 
+MAKE_1D_HIST_PLOTS = True
 
 
 
@@ -138,7 +150,7 @@ date_list = ['2018-11', '2019-01', '2019-03']
 
 data_flag_list = ['oib_detailed']
 #date_list = ['2018-11', '2019-01']
-date_list = ['2019-03']
+# date_list = ['2019-03']
 
 # big for loop? iterate over data_flag and monthday
 # data_flag is no longer a constant I guess
@@ -491,36 +503,56 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
 
 
-if MAKE_SNOW_DEPTH_DENS_PLOTS:
-	lons = nesosim_data['longitude'] # same lat and lon used everywhere I think
-	lats = nesosim_data['latitude']
+	if MAKE_SNOW_DEPTH_DENS_PLOTS:
+		lons = nesosim_data['longitude'] # same lat and lon used everywhere I think
+		lats = nesosim_data['latitude']
 
 
-	
+		
 
-	# snow depth
-	var = h_s
-	# mask out where sit is unphysical
-	var[sea_ice_thickness < 0] = np.nan
-	title = 'NESOSIM-MCMC snow depth for {} (m)'.format(monthday)
-	filename = '{}snow_depth_map_{}_{}.png'.format(fig_path,data_flag,monthday)
-	plot_map(var, lons, lats, title, filename, ice_mask_idx,vmax=0.6)
+		# snow depth
+		var = h_s
+		# mask out where sit is unphysical
+		var[sea_ice_thickness < 0] = np.nan
+		title = 'NESOSIM-MCMC snow depth for {} (m)'.format(monthday)
+		filename = '{}snow_depth_map_{}_{}.png'.format(fig_path,data_flag,monthday)
+		plot_map(var, lons, lats, title, filename, ice_mask_idx,vmax=0.6)
 
-	var = r_s
-	var[sea_ice_thickness < 0] = np.nan
-	title = 'NESOSIM-MCMC snow density for {} (kg/m^3)'.format(monthday)
-	filename = '{}snow_density_map_{}_{}.png'.format(fig_path, data_flag, monthday)
-	plot_map(var, lons, lats, title, filename, ice_mask_idx,vmin=300,cmap='YlOrBr')
-	
-	var = e_h_s
-	var[sea_ice_thickness < 0] = np.nan
-	title = 'NESOSIM-MCMC snow depth uncert. for {} (m)'.format(monthday)
-	filename = '{}snow_depth_unc_map_{}_{}.png'.format(fig_path, data_flag, monthday)
-	plot_map(var, lons, lats, title, filename, ice_mask_idx)
-	
-	var = e_r_s
-	var[sea_ice_thickness < 0] = np.nan
-	title = 'NESOSIM-MCMC snow density uncert. for {} (kg/m^3)'.format(monthday)
-	filename = '{}snow_density_unc_map_{}_{}.png'.format(fig_path, data_flag, monthday)
-	plot_map(var, lons, lats, title, filename, ice_mask_idx)
-	
+		var = r_s
+		var[sea_ice_thickness < 0] = np.nan
+		title = 'NESOSIM-MCMC snow density for {} (kg/m^3)'.format(monthday)
+		filename = '{}snow_density_map_{}_{}.png'.format(fig_path, data_flag, monthday)
+		plot_map(var, lons, lats, title, filename, ice_mask_idx,vmin=300,cmap='YlOrBr')
+		
+		var = e_h_s
+		var[sea_ice_thickness < 0] = np.nan
+		title = 'NESOSIM-MCMC snow depth uncert. for {} (m)'.format(monthday)
+		filename = '{}snow_depth_unc_map_{}_{}.png'.format(fig_path, data_flag, monthday)
+		plot_map(var, lons, lats, title, filename, ice_mask_idx)
+		
+		var = e_r_s
+		var[sea_ice_thickness < 0] = np.nan
+		title = 'NESOSIM-MCMC snow density uncert. for {} (kg/m^3)'.format(monthday)
+		filename = '{}snow_density_unc_map_{}_{}.png'.format(fig_path, data_flag, monthday)
+		plot_map(var, lons, lats, title, filename, ice_mask_idx)
+
+	if MAKE_1D_HIST_PLOTS:
+
+		# make histogram plots
+
+
+		var = h_s # snow depth
+		# mask out where sit is unphysical
+		var[sea_ice_thickness < 0] = np.nan
+
+		title = 'NESOSIM-MCMC snow depth distribution for {}'.format(monthday)
+		filename = '{}snow_depth_distribution_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+
+		# should I normalize these??
+		xlabel = 'Snow depth (m)'
+		ylabel = 'Count'
+
+		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)
+
+		
+
