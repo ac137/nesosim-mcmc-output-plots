@@ -131,7 +131,8 @@ MAKE_SIT_CORREL_PLOTS = False# plot nesosim-mcmc and regridded is2 product sit
 MAKE_UNCERT_CORREL_PLOTS = False# plot comparison plots of the uncertainties
 MAKE_SNOW_DEPTH_DENS_PLOTS = False 
 MAKE_1D_HIST_PLOTS = False
-MAKE_BOX_PLOTS = True
+MAKE_BOX_PLOTS = False
+MAKE_PERCENT_PLOTS = True
 
 
 # estimate based on retrieval in Petty et al 2020
@@ -633,6 +634,22 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		val_dict['e_sit_is2'].append(sit_uncert_is2.values.flatten())
 
 
+	if MAKE_PERCENT_PLOTS:
+		# snow-only divided by is2 and make a map
+
+		uncert_ratio = 100*random_uncert_snow_only / uncert_previous
+
+		var = uncert_ratio # sit value difference
+		lons = nesosim_data['longitude'] # same lat and lon used everywhere 
+		lats = nesosim_data['latitude']
+		title = 'Snow-only uncertainty percentage vs. total uncertainty {}'.format(monthday)
+		filename = '{}snow_over_p2020_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+		plot_map(var, lons, lats, title, filename, ice_mask_idx)
+
+
+
+
+
 
 if MAKE_BOX_PLOTS:
 	df1 = pd.DataFrame(np.array(val_dict['sit_mcmc']).transpose(),columns=val_dict['month'])
@@ -681,3 +698,28 @@ if MAKE_BOX_PLOTS:
 	plt.ylabel('Sea ice thickness uncertainty (m)')
 	plt.title('Monthly sea ice thickness uncert spatial distribution')
 	plt.savefig('{}sit_uncert_mcmc_plot_violin_{}.png'.format(fig_path, data_flag))
+
+
+
+	# df1 = pd.DataFrame(np.array(val_dict['sit_mcmc']).transpose(),columns=val_dict['month'])
+	# df1 = df1.stack()
+	# df1.rename('MCMC',inplace=True) #is the renaming redundant?
+	# df2 = pd.DataFrame(np.array(val_dict['sit_is2']).transpose(),columns=val_dict['month'])
+	# df2 = df2.stack()
+	# df2.rename('IS2',inplace=True)
+	
+
+	# df = pd.concat([df1, df2],keys=['MCMC','IS2'], axis=0).reset_index()
+
+	# df.columns = ['Product','idx','Month','value']
+
+	# plt.figure(dpi=200)
+	# sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='crest',split=True,order=val_dict['month'],inner='quartile') 
+
+	# #plt.xticks(ticks=range(len(val_dict['month'])), labels=val_dict['month'])
+	# plt.legend(loc='upper center')
+	# plt.ylabel('Sea ice thickness (m)')
+	# plt.title('Monthly sea ice thickness spatial distribution')
+	# plt.savefig('{}sit_mcmc_plot_violin_{}.png'.format(fig_path, data_flag))
+
+
