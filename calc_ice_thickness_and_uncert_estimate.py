@@ -621,6 +621,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		sea_ice_thickness[lto] = np.nan
 		random_uncert[lto] = np.nan
 		sit_uncert_is2.values[lto] = np.nan
+		sit_uncert_is2.values[sit_uncert_is2.values > 10]=np.nan
 
 		
 		val_dict['month'].append(monthday)
@@ -647,9 +648,9 @@ if MAKE_BOX_PLOTS:
 	df.columns = ['Product','idx','Month','value']
 
 	plt.figure(dpi=200)
-	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='crest',split=True) 
+	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='crest',split=True,order=val_dict['month'],inner='quartile') 
 
-	plt.xticks(ticks=range(len(val_dict['month'])), labels=val_dict['month'])
+	#plt.xticks(ticks=range(len(val_dict['month'])), labels=val_dict['month'])
 	plt.legend(loc='upper center')
 	plt.ylabel('Sea ice thickness (m)')
 	plt.title('Monthly sea ice thickness spatial distribution')
@@ -671,15 +672,11 @@ if MAKE_BOX_PLOTS:
 	print(df)
 	df.columns = ['Product','idx','Month','value']
 	# create dataframe?
-	# sns.boxplot(x=val_dict['month'],data=val_dict['sit_mcmc'])
 	plt.figure(dpi=200)
 
-	#sns.boxplot(data=val_dict['sit_mcmc'], palette='crest',showfliers=False)
-#	sns.violinplot(data=val_dict['sit_mcmc'], palette='crest')#,showfliers=False)
-#	sns.violinplot(data=val_dict['sit_is2'],palette='crest')
-	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='crest',split=True) 
-	#sns.stripplot(data=val_dict['sit_mcmc'],size=4, color=".3", linewidth=1, alpha=0.6, jitter=0.35,marker='x')
-	plt.xticks(ticks=range(len(val_dict['month'])), labels=val_dict['month'])
+	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='crest',split=True,order=val_dict['month'],inner='quartile') 
+#	sns.boxplot(data=df,x='Month',y='value',hue='Product',palette='crest') 
+	#plt.xticks(ticks=range(len(val_dict['month'])), labels=val_dict['month'])
 	plt.legend(loc='upper center')
 	plt.ylabel('Sea ice thickness uncertainty (m)')
 	plt.title('Monthly sea ice thickness uncert spatial distribution')
