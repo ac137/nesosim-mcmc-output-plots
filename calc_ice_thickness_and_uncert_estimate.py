@@ -742,7 +742,6 @@ if MAKE_BOX_PLOTS:
 	plt.figure(dpi=200)
 	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='Blues',split=True,order=val_dict['month'],inner='quartile',cut=0) 
 
-	#plt.xticks(ticks=range(len(val_dict['month'])), labels=val_dict['month'])
 	plt.legend(loc='upper center')
 	plt.ylabel('Snow depth (m)')
 	plt.title('Monthly snow depth spatial distribution')
@@ -775,31 +774,59 @@ if MAKE_BOX_PLOTS:
 
 
 
-	df1 = pd.DataFrame(np.array(val_dict['ehs']).transpose(),columns=val_dict['month'])
-	df1 = df1.stack().to_frame().reset_index()
+	# df1 = pd.DataFrame(np.array(val_dict['ehs']).transpose(),columns=val_dict['month'])
+	# df1 = df1.stack().to_frame().reset_index()
 
 
-	df1.columns = ['idx','Month','value']
+	# df1.columns = ['idx','Month','value']
 
-	plt.figure(dpi=200)
-	sns.violinplot(data=df1,x='Month',y='value', palette='Blues', split=True, order=val_dict['month'], inner='quartile',cut=0) 
+	# plt.figure(dpi=200)
+	# sns.violinplot(data=df1,x='Month',y='value', palette='Blues', split=True, order=val_dict['month'], inner='quartile',cut=0) 
 
-	plt.ylabel('Snow depth uncert (m)')
-	plt.title('Monthly snow depth uncertainty spatial distribution')
-	plt.savefig('{}snow_depth_uncert_plot_violin_{}.png'.format(fig_path, data_flag))
+	# plt.ylabel('Snow depth uncert (m)')
+	# plt.title('Monthly snow depth uncertainty spatial distribution')
+	# plt.savefig('{}snow_depth_uncert_plot_violin_{}.png'.format(fig_path, data_flag))
 
 
 
 	############## snow density uncertainty
-	df1 = pd.DataFrame(np.array(val_dict['ers']).transpose(),columns=val_dict['month'])
-	df1 = df1.stack().to_frame().reset_index()
+	# df1 = pd.DataFrame(np.array(val_dict['ers']).transpose(),columns=val_dict['month'])
+	# df1 = df1.stack().to_frame().reset_index()
 
+
+	# df1.columns = ['idx','Month','value']
+
+	# plt.figure(dpi=200)
+	# sns.violinplot(data=df1,x='Month',y='value', palette='YlOrBr', split=True, order=val_dict['month'], inner='quartile',cut=0) 
+
+	# plt.ylabel('Snow density uncert (kg/m$^3$)')
+	# plt.title('Monthly snow density uncertainty spatial distribution')
+	# plt.savefig('{}snow_dens_uncert_plot_violin_{}.png'.format(fig_path, data_flag))
+
+
+
+	
+	####### snow depth + dens uncertainty double plot
+	df1 = pd.DataFrame(np.array(val_dict['ehs']).transpose(),columns=val_dict['month'])
+	df1 = df1.stack().to_frame().reset_index()
 
 	df1.columns = ['idx','Month','value']
 
-	plt.figure(dpi=200)
-	sns.violinplot(data=df1,x='Month',y='value', palette='YlOrBr', split=True, order=val_dict['month'], inner='quartile',cut=0) 
+	df2 = pd.DataFrame(np.array(val_dict['ers']).transpose(),columns=val_dict['month'])
+	df2 = df2.stack().to_frame().reset_index()
 
-	plt.ylabel('Snow density uncert (kg/m$^3$)')
-	plt.title('Monthly snow density uncertainty spatial distribution')
-	plt.savefig('{}snow_dens_uncert_plot_violin_{}.png'.format(fig_path, data_flag))
+
+	df2.columns = ['idx','Month','value']
+
+	fig, (ax1, ax2) = plt.subplots(1, 2,dpi=200)
+	sns.violinplot(data=df1,x='Month',y='value', palette='Blues', split=True, order=val_dict['month'], inner='quartile',cut=0,ax=ax1)
+	sns.violinplot(data=df2,x='Month',y='value', palette='YlOrBr', split=True, order=val_dict['month'], inner='quartile',cut=0,ax=ax2) 
+ 
+
+	ax1.set_ylabel('Snow depth uncert (m)')
+	ax2.set_ylabel('Snow density uncert (kg/m$^3$)')
+	fig.suptitle('Monthly snow uncertainty spatial distributions')
+
+
+	plt.savefig('{}snow_depth_dens_uncert_subplots_violin_{}.png'.format(fig_path, data_flag))
+
