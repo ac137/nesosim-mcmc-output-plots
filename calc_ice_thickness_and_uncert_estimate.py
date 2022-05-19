@@ -640,11 +640,14 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		uncert_ratio = 100*random_uncert_snow_only / uncert_previous
 
 		var = uncert_ratio # sit value difference
+
+		# mask out ice
+		uncert_ratio[sea_ice_thickness < 0] = np.nan
 		lons = nesosim_data['longitude'] # same lat and lon used everywhere 
 		lats = nesosim_data['latitude']
-		title = 'Snow-only uncertainty percentage vs. total uncertainty {}'.format(monthday)
+		title = 'Snow uncertainty contribution to total uncertainty (%) for {}'.format(monthday)
 		filename = '{}snow_over_p2020_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
-		plot_map(var, lons, lats, title, filename, ice_mask_idx)
+		plot_map(var, lons, lats, title, filename, ice_mask_idx)#,vmax=20)
 
 
 
