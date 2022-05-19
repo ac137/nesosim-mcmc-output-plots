@@ -818,7 +818,7 @@ if MAKE_BOX_PLOTS:
 
 	df2.columns = ['idx','Month','value']
 
-	fig, (ax1, ax2) = plt.subplots(1, 2,dpi=200)
+	fig, (ax1, ax2) = plt.subplots(1, 2,dpi=200,figsize=(8,4))
 	sns.violinplot(data=df1,x='Month',y='value', palette='Blues', split=True, order=val_dict['month'], inner='quartile',cut=0,ax=ax1)
 	sns.violinplot(data=df2,x='Month',y='value', palette='YlOrBr', split=True, order=val_dict['month'], inner='quartile',cut=0,ax=ax2) 
  
