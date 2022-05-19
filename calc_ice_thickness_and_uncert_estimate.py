@@ -727,47 +727,47 @@ if MAKE_BOX_PLOTS:
 
 
 	########## violin default vs optimized snow depth
-	df1 = pd.DataFrame(np.array(val_dict['hs_default']).transpose(),columns=val_dict['month'])
-	df1 = df1.stack()
-	df1.rename('default',inplace=True) #is the renaming redundant?
-	df2 = pd.DataFrame(np.array(val_dict['hs']).transpose(),columns=val_dict['month'])
-	df2 = df2.stack()
-	df2.rename('MCMC',inplace=True)
+	# df1 = pd.DataFrame(np.array(val_dict['hs_default']).transpose(),columns=val_dict['month'])
+	# df1 = df1.stack()
+	# df1.rename('default',inplace=True) #is the renaming redundant?
+	# df2 = pd.DataFrame(np.array(val_dict['hs']).transpose(),columns=val_dict['month'])
+	# df2 = df2.stack()
+	# df2.rename('MCMC',inplace=True)
 
 
-	df = pd.concat([df2, df1],keys=['MCMC','Default'], axis=0).reset_index()
+	# df = pd.concat([df2, df1],keys=['MCMC','Default'], axis=0).reset_index()
 
-	df.columns = ['Product','idx','Month','value']
+	# df.columns = ['Product','idx','Month','value']
 
-	plt.figure(dpi=200)
-	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='Blues',split=True,order=val_dict['month'],inner='quartile',cut=0) 
+	# plt.figure(dpi=200)
+	# sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='Blues',split=True,order=val_dict['month'],inner='quartile',cut=0) 
 
-	plt.legend(loc='upper center')
-	plt.ylabel('Snow depth (m)')
-	plt.title('Monthly snow depth spatial distribution')
-	plt.savefig('{}snow_depth_plot_violin_{}.png'.format(fig_path, data_flag))
-
-
-	######### violing default vs optimized snow density
-	df1 = pd.DataFrame(np.array(val_dict['rs_default']).transpose(),columns=val_dict['month'])
-	df1 = df1.stack()
-	df1.rename('default',inplace=True) #is the renaming redundant?
-	df2 = pd.DataFrame(np.array(val_dict['rs']).transpose(),columns=val_dict['month'])
-	df2 = df2.stack()
-	df2.rename('MCMC',inplace=True)
+	# plt.legend(loc='upper center')
+	# plt.ylabel('Snow depth (m)')
+	# plt.title('Monthly snow depth spatial distribution')
+	# plt.savefig('{}snow_depth_plot_violin_{}.png'.format(fig_path, data_flag))
 
 
-	df = pd.concat([df2, df1],keys=['MCMC','Default'], axis=0).reset_index()
+	# ######### violing default vs optimized snow density
+	# df1 = pd.DataFrame(np.array(val_dict['rs_default']).transpose(),columns=val_dict['month'])
+	# df1 = df1.stack()
+	# df1.rename('default',inplace=True) #is the renaming redundant?
+	# df2 = pd.DataFrame(np.array(val_dict['rs']).transpose(),columns=val_dict['month'])
+	# df2 = df2.stack()
+	# df2.rename('MCMC',inplace=True)
 
-	df.columns = ['Product','idx','Month','value']
 
-	plt.figure(dpi=200)
-	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='YlOrBr',split=True,order=val_dict['month'],inner='quartile',cut=0) 
+	# df = pd.concat([df2, df1],keys=['MCMC','Default'], axis=0).reset_index()
 
-	plt.legend(loc='lower right')
-	plt.ylabel('Snow density (kg/m$^3$)')
-	plt.title('Monthly snow density spatial distribution')
-	plt.savefig('{}snow_density_plot_violin_{}.png'.format(fig_path, data_flag))
+	# df.columns = ['Product','idx','Month','value']
+
+	# plt.figure(dpi=200)
+	# sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='YlOrBr',split=True,order=val_dict['month'],inner='quartile',cut=0) 
+
+	# plt.legend(loc='lower right')
+	# plt.ylabel('Snow density (kg/m$^3$)')
+	# plt.title('Monthly snow density spatial distribution')
+	# plt.savefig('{}snow_density_plot_violin_{}.png'.format(fig_path, data_flag))
 
 
 	################ snow depth uncertainty
@@ -806,7 +806,7 @@ if MAKE_BOX_PLOTS:
 
 
 	
-	####### snow depth + dens uncertainty double plot
+	####### snow depth + dens uncertainty double figure plot
 	df1 = pd.DataFrame(np.array(val_dict['ehs']).transpose(),columns=val_dict['month'])
 	df1 = df1.stack().to_frame().reset_index()
 
@@ -830,3 +830,41 @@ if MAKE_BOX_PLOTS:
 
 	plt.savefig('{}snow_depth_dens_uncert_subplots_violin_{}.png'.format(fig_path, data_flag))
 
+
+	############## snow depth and snow density double figure plot
+	df1 = pd.DataFrame(np.array(val_dict['hs_default']).transpose(),columns=val_dict['month'])
+	df1 = df1.stack()
+	df1.rename('default',inplace=True) #is the renaming redundant?
+	df2 = pd.DataFrame(np.array(val_dict['hs']).transpose(),columns=val_dict['month'])
+	df2 = df2.stack()
+	df2.rename('MCMC',inplace=True)
+
+
+	df_depth = pd.concat([df2, df1],keys=['MCMC','Default'], axis=0).reset_index()
+
+	df_depth.columns = ['Product','idx','Month','value']
+
+	df1 = pd.DataFrame(np.array(val_dict['rs_default']).transpose(),columns=val_dict['month'])
+	df1 = df1.stack()
+	df1.rename('default',inplace=True) #is the renaming redundant?
+	df2 = pd.DataFrame(np.array(val_dict['rs']).transpose(),columns=val_dict['month'])
+	df2 = df2.stack()
+	df2.rename('MCMC',inplace=True)
+
+
+	df_dens = pd.concat([df2, df1],keys=['MCMC','Default'], axis=0).reset_index()
+
+	df_dens.columns = ['Product','idx','Month','value']
+
+
+	# have df_depth and df_dens and want to plot subfigures
+	fig, (ax1, ax2) = plt.subplots(1, 2,dpi=200,figsize=(8,4))
+
+	sns.violinplot(data=df_depth,x='Month',y='value',hue='Product',palette='Blues',split=True,order=val_dict['month'],inner='quartile',cut=0,ax=ax1) 
+	sns.violinplot(data=df_dens,x='Month',y='value',hue='Product',palette='YlOrBr',split=True,order=val_dict['month'],inner='quartile',cut=0,ax=ax2) 
+	ax1.legend(loc='upper center')
+	ax2.legend(loc='lower right')
+	ax1.set_ylabel('Snow depth (m)')
+	ax2.set_ylabel('Snow density (kg/m$^3$)')
+	fig.suptitle('Monthly snow spatial distributions')
+	plt.savefig('{}snow_depth_dens_subplots_violin_{}.png'.format(fig_path, data_flag))
