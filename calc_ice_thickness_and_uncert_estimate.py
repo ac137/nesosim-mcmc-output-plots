@@ -47,6 +47,53 @@ def plot_map(var, lons, lats, title, filename, sic, cmap='Blues', **kwargs):
              #  loc='lower left')#, bbox_to_anchor=(0.025, -0.1), fancybox=True)
 	plt.savefig(filename)
 
+def plot_two_maps(var1, var2, lons, lats, title1, title2, filename, sic, cmap1='Blues',cmap2='YlOrBr', **kwargs):
+	'''create a map plot of variable var, longitudes lons, latitudes lats
+	title (for plot), to be saved to file named filename.
+	sic is a 2d array of sea ice concentration (binary mask?)
+	kwargs are for pcolormesh (eg. vmin, vmax, cmap, etc.)
+	'''
+	matplotlib.rcParams.update(matplotlib.rcParamsDefault)
+	proj=ccrs.NorthPolarStereo(central_longitude=-45)
+	proj_coord = ccrs.PlateCarree()
+
+
+
+	fig = plt.figure(dpi=200)
+	ax1 = fig.add_subplot(1, 2, 1, projection=proj)
+	ax2 = fig.add_subplot(1, 2, 2, projection=proj)
+	ax1.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
+	ax2.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
+
+	# sic mask; factor of 0.3 to adjust shading colour
+	ax1.pcolormesh(lons,lats,sic*0.3, transform=proj_coord, shading='flat', cmap="Greys",vmin=0,vmax=1, label='SIC >= 0.5')
+	ax2.pcolormesh(lons,lats,sic*0.3, transform=proj_coord, shading='flat', cmap="Greys",vmin=0,vmax=1, label='SIC >= 0.5')
+
+	pcm1 = ax.pcolormesh(lons,lats,var1,transform=proj_coord,shading='flat', cmap=cmap, **kwargs) # using flat shading avoids artefacts
+	pcm2 = ax.pcolormesh(lons,lats,var2,transform=proj_coord,shading='flat', cmap=cmap2, **kwargs) # using flat shading avoids artefacts
+
+	ax1.coastlines(zorder=3)
+	ax1.gridlines(draw_labels=False,
+	          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
+	ax2.coastlines(zorder=3)
+	ax2.gridlines(draw_labels=False,
+	          linewidth=0.22, color='gray', alpha=0.5, linestyle='--')
+
+	# for some reason this extent complains if you set set -180 to +180
+
+	ax1.set_title(title1)
+	ax2.set_title(title2)
+	fig.colorbar(pcm1,ax=ax1)
+	fig.colorbar(pcm2,ax=ax2)
+
+	# need to manually add legend, apparently
+	sic_legend_patch = matplotlib.patches.Rectangle((0, 0), 1, 1, facecolor="#CECECE")
+	labels = ['SIC >= 0.5']
+	ax1.legend([sic_legend_patch], labels)#,
+             #  loc='lower left')#, bbox_to_anchor=(0.025, -0.1), fancybox=True)
+	plt.savefig(filename)
+
+
 
 def plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, nbins=20, cmap='Blues', color='m',**kwargs):
 	''' assumes x and y are unflattened nd arrays (same shape/size)
@@ -131,10 +178,9 @@ MAKE_SIT_CORREL_PLOTS = False# plot nesosim-mcmc and regridded is2 product sit
 MAKE_UNCERT_CORREL_PLOTS = False# plot comparison plots of the uncertainties
 MAKE_SNOW_DEPTH_DENS_PLOTS = False 
 MAKE_1D_HIST_PLOTS = False
-MAKE_BOX_PLOTS = True
+MAKE_BOX_PLOTS = False
 MAKE_PERCENT_PLOTS = False
-
-
+MAKE_MAP_SUBPLOTS = True
 # estimate based on retrieval in Petty et al 2020
 
 # monthday='2018-11'
@@ -669,6 +715,24 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		filename = '{}snow_over_p2020_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 		plot_map(var, lons, lats, title, filename, ice_mask_idx)#,vmax=20)
 
+	if MAKE_MAP_SUBPLOTS:
+
+		lons = nesosim_data['longitude'] # same lat and lon used everywhere 
+		lats = nesosim_data['latitude']
+
+		var1 = h_s
+		# mask out where sit is unphysical
+		var1[sea_ice_thickness < 0] = np.nan
+
+		var2 = r_s
+		var2[sea_ice_thickness < 0] = np.nan
+
+		title1 = 'NESOSIM-MCMC snow depth for {} (m)'.format(monthday)
+		title2 = 'NESOSIM-MCMC snow density for {} (m)'.format(monthday)
+
+		filename = '{}snow_depth_dens_subplot_map_{}_{}.png'.format(fig_path,data_flag,monthday)
+
+		plot_two_maps(var1, var2, lons, lats, title1, title2, filename, ice_mask_idx, cmap1='Blues',cmap2='YlOrBr')
 
 
 
