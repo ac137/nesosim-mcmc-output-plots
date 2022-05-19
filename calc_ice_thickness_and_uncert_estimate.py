@@ -867,4 +867,5 @@ if MAKE_BOX_PLOTS:
 	ax1.set_ylabel('Snow depth (m)')
 	ax2.set_ylabel('Snow density (kg/m$^3$)')
 	fig.suptitle('Monthly snow spatial distributions')
+	plt.tight_layout()
 	plt.savefig('{}snow_depth_dens_subplots_violin_{}.png'.format(fig_path, data_flag))
