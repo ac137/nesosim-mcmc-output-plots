@@ -166,6 +166,10 @@ val_dict['sit_is2'] = []
 val_dict['month'] = []
 val_dict['e_sit_mcmc'] = []
 val_dict['e_sit_is2'] = []
+val_dict['hs_default'] = []
+val_dict['rs_default'] = []
+val_dict['rs'] = []
+val_dict['ers'] = []
 
 for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
@@ -190,11 +194,14 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 	nesosim_data = xr.open_dataset(nesosim_data_path)
 	nesosim_uncertainty = xr.open_dataset(nesosim_uncert_path)
 
+	nesosim_default = xr.open_dataset('/users/jk/18/acabaj/NESOSIM/output/100km/ERA5CSscaledsfERA5windsOSISAFdriftsCDRsicrhovariable_IC2_DYN1_WP1_LL1_AL1_WPF5.8e-07_WPT5_LLF2.9e-07-100kmv11mcmc/final/NESOSIMv11_01092018-30042019.nc')
+
 
 	days = pd.to_datetime(nesosim_data['day'].values,format='%Y%m%d')
 
 	nesosim_data['day'] = days
 	nesosim_uncertainty['day'] = days
+	nesosim_default['day'] = days
 
 	# select corresponding month & calculate monthly mean
 	print(nesosim_data)
@@ -203,6 +210,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
 	nesosim_data_monthly = nesosim_data.sel(day=monthday)
 	nesosim_uncert_monthly = nesosim_uncertainty.sel(day=monthday)
+	nesosim_default_monthly = nesosim_default.sel(day=monthday)
 
 
 	# make sure latitude and longitude are lined up!!!
@@ -229,6 +237,10 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 	h_f = is2_data['freeboard'].values[0,:,:]
 	#
 	nesosim_sic = nesosim_data_monthly['ice_concentration'].mean(axis=0).values
+
+	# default snow depth
+	h_s_default = nesosim_default_monthly['snow_depth'].mean(axis=0).values
+	r_s_default = nesosim_default_monthly['snow_density'].mean(axis=0).values
 
 	# create a binary sic mask
 	SIC_THRESHOLD = 0.5
@@ -623,8 +635,12 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		random_uncert[lto] = np.nan
 		sit_uncert_is2.values[lto] = np.nan
 		sit_uncert_is2.values[sit_uncert_is2.values > 10]=np.nan
+		h_s_default[lto] = np.nan 
+		r_s_default[lto] = np.nan
+		r_s[lto] = np.nan
+		e_r_s[lto] = np.nan
 
-		
+		# accumulate in dictionary
 		val_dict['month'].append(monthday)
 		val_dict['hs'].append(h_s.flatten())
 		val_dict['ehs'].append(e_h_s.flatten())
@@ -632,6 +648,10 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		val_dict['sit_is2'].append(sit_is2.values.flatten())
 		val_dict['e_sit_mcmc'].append(random_uncert.flatten())
 		val_dict['e_sit_is2'].append(sit_uncert_is2.values.flatten())
+		val_dict['hs_default'].append(h_s_default.flatten())
+		val_dict['rs_default'].append(r_s_default.flatten())
+		val_dict['rs'].append(r_s.flatten())
+		val_dict['ers'].append(e_r_s.flatten())
 
 
 	if MAKE_PERCENT_PLOTS:
@@ -655,6 +675,8 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
 
 if MAKE_BOX_PLOTS:
+
+	########### violin plot: mcmc vs is2 sit
 	df1 = pd.DataFrame(np.array(val_dict['sit_mcmc']).transpose(),columns=val_dict['month'])
 	df1 = df1.stack()
 	df1.rename('MCMC',inplace=True) #is the renaming redundant?
@@ -677,52 +699,109 @@ if MAKE_BOX_PLOTS:
 	plt.savefig('{}sit_mcmc_plot_violin_{}.png'.format(fig_path, data_flag))
 
 
-
-	df1 = pd.DataFrame(np.array(val_dict['e_sit_mcmc']).transpose(),columns=val_dict['month'])
-	df1 = df1.stack()
-	df1.rename('MCMC',inplace=True)
-	df2 = pd.DataFrame(np.array(val_dict['e_sit_is2']).transpose(),columns=val_dict['month'])
-	df2 = df2.stack()
-	df2.rename('IS2',inplace=True)
+	############# error sit violin
+# 	df1 = pd.DataFrame(np.array(val_dict['e_sit_mcmc']).transpose(),columns=val_dict['month'])
+# 	df1 = df1.stack()
+# 	df1.rename('MCMC',inplace=True)
+# 	df2 = pd.DataFrame(np.array(val_dict['e_sit_is2']).transpose(),columns=val_dict['month'])
+# 	df2 = df2.stack()
+# 	df2.rename('IS2',inplace=True)
 	
 
-	df = pd.concat([df1, df2],keys=['MCMC','IS2'], axis=0).reset_index()
-#	df.columns = ['date','value']
+# 	df = pd.concat([df1, df2],keys=['MCMC','IS2'], axis=0).reset_index()
+# #	df.columns = ['date','value']
 
-	print(df)
+# 	print(df)
+# 	df.columns = ['Product','idx','Month','value']
+# 	# create dataframe?
+# 	plt.figure(dpi=200)
+
+# 	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='crest',split=True,order=val_dict['month'],inner='quartile') 
+# #	sns.boxplot(data=df,x='Month',y='value',hue='Product',palette='crest') 
+# 	#plt.xticks(ticks=range(len(val_dict['month'])), labels=val_dict['month'])
+# 	plt.legend(loc='upper center')
+# 	plt.ylabel('Sea ice thickness uncertainty (m)')
+# 	plt.title('Monthly sea ice thickness uncert spatial distribution')
+# 	plt.savefig('{}sit_uncert_mcmc_plot_violin_{}.png'.format(fig_path, data_flag))
+
+
+
+	########## violin default vs optimized snow depth
+	df1 = pd.DataFrame(np.array(val_dict['hs_default']).transpose(),columns=val_dict['month'])
+	df1 = df1.stack()
+	df1.rename('default',inplace=True) #is the renaming redundant?
+	df2 = pd.DataFrame(np.array(val_dict['hs']).transpose(),columns=val_dict['month'])
+	df2 = df2.stack()
+	df2.rename('MCMC',inplace=True)
+
+
+	df = pd.concat([df2, df1],keys=['MCMC','Default'], axis=0).reset_index()
+
 	df.columns = ['Product','idx','Month','value']
-	# create dataframe?
-	plt.figure(dpi=200)
 
-	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='crest',split=True,order=val_dict['month'],inner='quartile') 
-#	sns.boxplot(data=df,x='Month',y='value',hue='Product',palette='crest') 
+	plt.figure(dpi=200)
+	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='Blues',split=True,order=val_dict['month'],inner='quartile') 
+
 	#plt.xticks(ticks=range(len(val_dict['month'])), labels=val_dict['month'])
 	plt.legend(loc='upper center')
-	plt.ylabel('Sea ice thickness uncertainty (m)')
-	plt.title('Monthly sea ice thickness uncert spatial distribution')
-	plt.savefig('{}sit_uncert_mcmc_plot_violin_{}.png'.format(fig_path, data_flag))
+	plt.ylabel('Snow depth (m)')
+	plt.title('Monthly snow depth spatial distribution')
+	plt.savefig('{}snow_depth_plot_violin_{}.png'.format(fig_path, data_flag))
+
+
+	######### violing default vs optimized snow density
+	df1 = pd.DataFrame(np.array(val_dict['rs_default']).transpose(),columns=val_dict['month'])
+	df1 = df1.stack()
+	df1.rename('default',inplace=True) #is the renaming redundant?
+	df2 = pd.DataFrame(np.array(val_dict['rs']).transpose(),columns=val_dict['month'])
+	df2 = df2.stack()
+	df2.rename('MCMC',inplace=True)
+
+
+	df = pd.concat([df2, df1],keys=['MCMC','Default'], axis=0).reset_index()
+
+	df.columns = ['Product','idx','Month','value']
+
+	plt.figure(dpi=200)
+	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='YlOrBr',split=True,order=val_dict['month'],inner='quartile') 
+
+	plt.legend(loc='lower right')
+	plt.ylabel('Snow density (kg/m$^3$)')
+	plt.title('Monthly snow density spatial distribution')
+	plt.savefig('{}snow_density_plot_violin_{}.png'.format(fig_path, data_flag))
+
+
+	################ snow depth uncertainty
 
 
 
-	# df1 = pd.DataFrame(np.array(val_dict['sit_mcmc']).transpose(),columns=val_dict['month'])
-	# df1 = df1.stack()
-	# df1.rename('MCMC',inplace=True) #is the renaming redundant?
-	# df2 = pd.DataFrame(np.array(val_dict['sit_is2']).transpose(),columns=val_dict['month'])
-	# df2 = df2.stack()
-	# df2.rename('IS2',inplace=True)
-	
-
-	# df = pd.concat([df1, df2],keys=['MCMC','IS2'], axis=0).reset_index()
-
-	# df.columns = ['Product','idx','Month','value']
-
-	# plt.figure(dpi=200)
-	# sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='crest',split=True,order=val_dict['month'],inner='quartile') 
-
-	# #plt.xticks(ticks=range(len(val_dict['month'])), labels=val_dict['month'])
-	# plt.legend(loc='upper center')
-	# plt.ylabel('Sea ice thickness (m)')
-	# plt.title('Monthly sea ice thickness spatial distribution')
-	# plt.savefig('{}sit_mcmc_plot_violin_{}.png'.format(fig_path, data_flag))
+	df1 = pd.DataFrame(np.array(val_dict['e_h_s']).transpose(),columns=val_dict['month'])
+	df1 = df1.stack().to_frame().reset_index()
 
 
+	df1.columns = ['idx','Month','value']
+
+	plt.figure(dpi=200)
+	sns.violinplot(data=df1,x='Month',y='value', palette='Blues', split=True, order=val_dict['month'], inner='quartile') 
+
+	plt.legend(loc='upper center')
+	plt.ylabel('Snow depth uncert (m)')
+	plt.title('Monthly snow depth uncertainty spatial distribution')
+	plt.savefig('{}snow_depth_uncert_plot_violin_{}.png'.format(fig_path, data_flag))
+
+
+
+	############## snow density uncertainty
+	df1 = pd.DataFrame(np.array(val_dict['e_r_s']).transpose(),columns=val_dict['month'])
+	df1 = df1.stack().to_frame().reset_index()
+
+
+	df1.columns = ['idx','Month','value']
+
+	plt.figure(dpi=200)
+	sns.violinplot(data=df1,x='Month',y='value', palette='YlOrBr', split=True, order=val_dict['month'], inner='quartile') 
+
+	plt.legend(loc='upper center')
+	plt.ylabel('Snow density uncert (kg/m$^3$)')
+	plt.title('Monthly snow density uncertainty spatial distribution')
+	plt.savefig('{}snow_dens_uncert_plot_violin_{}.png'.format(fig_path, data_flag))
