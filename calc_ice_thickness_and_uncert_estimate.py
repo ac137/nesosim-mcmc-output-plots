@@ -131,8 +131,8 @@ MAKE_SIT_CORREL_PLOTS = False# plot nesosim-mcmc and regridded is2 product sit
 MAKE_UNCERT_CORREL_PLOTS = False# plot comparison plots of the uncertainties
 MAKE_SNOW_DEPTH_DENS_PLOTS = False 
 MAKE_1D_HIST_PLOTS = False
-MAKE_BOX_PLOTS = False
-MAKE_PERCENT_PLOTS = True
+MAKE_BOX_PLOTS = True
+MAKE_PERCENT_PLOTS = False
 
 
 # estimate based on retrieval in Petty et al 2020
@@ -690,7 +690,7 @@ if MAKE_BOX_PLOTS:
 	df.columns = ['Product','idx','Month','value']
 
 	plt.figure(dpi=200)
-	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='crest',split=True,order=val_dict['month'],inner='quartile') 
+	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='crest',split=True,order=val_dict['month'],inner='quartile',cut=0) 
 
 	#plt.xticks(ticks=range(len(val_dict['month'])), labels=val_dict['month'])
 	plt.legend(loc='upper center')
@@ -716,7 +716,7 @@ if MAKE_BOX_PLOTS:
 # 	# create dataframe?
 # 	plt.figure(dpi=200)
 
-# 	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='crest',split=True,order=val_dict['month'],inner='quartile') 
+# 	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='crest',split=True,order=val_dict['month'],inner='quartile',cut=0) 
 # #	sns.boxplot(data=df,x='Month',y='value',hue='Product',palette='crest') 
 # 	#plt.xticks(ticks=range(len(val_dict['month'])), labels=val_dict['month'])
 # 	plt.legend(loc='upper center')
@@ -740,7 +740,7 @@ if MAKE_BOX_PLOTS:
 	df.columns = ['Product','idx','Month','value']
 
 	plt.figure(dpi=200)
-	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='Blues',split=True,order=val_dict['month'],inner='quartile') 
+	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='Blues',split=True,order=val_dict['month'],inner='quartile',cut=0) 
 
 	#plt.xticks(ticks=range(len(val_dict['month'])), labels=val_dict['month'])
 	plt.legend(loc='upper center')
@@ -763,7 +763,7 @@ if MAKE_BOX_PLOTS:
 	df.columns = ['Product','idx','Month','value']
 
 	plt.figure(dpi=200)
-	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='YlOrBr',split=True,order=val_dict['month'],inner='quartile') 
+	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='YlOrBr',split=True,order=val_dict['month'],inner='quartile',cut=0) 
 
 	plt.legend(loc='lower right')
 	plt.ylabel('Snow density (kg/m$^3$)')
@@ -775,16 +775,15 @@ if MAKE_BOX_PLOTS:
 
 
 
-	df1 = pd.DataFrame(np.array(val_dict['e_h_s']).transpose(),columns=val_dict['month'])
+	df1 = pd.DataFrame(np.array(val_dict['ehs']).transpose(),columns=val_dict['month'])
 	df1 = df1.stack().to_frame().reset_index()
 
 
 	df1.columns = ['idx','Month','value']
 
 	plt.figure(dpi=200)
-	sns.violinplot(data=df1,x='Month',y='value', palette='Blues', split=True, order=val_dict['month'], inner='quartile') 
+	sns.violinplot(data=df1,x='Month',y='value', palette='Blues', split=True, order=val_dict['month'], inner='quartile',cut=0) 
 
-	plt.legend(loc='upper center')
 	plt.ylabel('Snow depth uncert (m)')
 	plt.title('Monthly snow depth uncertainty spatial distribution')
 	plt.savefig('{}snow_depth_uncert_plot_violin_{}.png'.format(fig_path, data_flag))
@@ -792,16 +791,15 @@ if MAKE_BOX_PLOTS:
 
 
 	############## snow density uncertainty
-	df1 = pd.DataFrame(np.array(val_dict['e_r_s']).transpose(),columns=val_dict['month'])
+	df1 = pd.DataFrame(np.array(val_dict['ers']).transpose(),columns=val_dict['month'])
 	df1 = df1.stack().to_frame().reset_index()
 
 
 	df1.columns = ['idx','Month','value']
 
 	plt.figure(dpi=200)
-	sns.violinplot(data=df1,x='Month',y='value', palette='YlOrBr', split=True, order=val_dict['month'], inner='quartile') 
+	sns.violinplot(data=df1,x='Month',y='value', palette='YlOrBr', split=True, order=val_dict['month'], inner='quartile',cut=0) 
 
-	plt.legend(loc='upper center')
 	plt.ylabel('Snow density uncert (kg/m$^3$)')
 	plt.title('Monthly snow density uncertainty spatial distribution')
 	plt.savefig('{}snow_dens_uncert_plot_violin_{}.png'.format(fig_path, data_flag))
