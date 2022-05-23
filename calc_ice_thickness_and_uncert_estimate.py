@@ -48,10 +48,12 @@ def plot_map(var, lons, lats, title, filename, sic, cmap='Blues', **kwargs):
 	plt.savefig(filename)
 
 def plot_two_maps(var1, var2, lons, lats, title1, title2, filename, sic, cmap1='Blues',cmap2='YlOrBr', **kwargs):
-	'''create a map plot of variable var, longitudes lons, latitudes lats
-	title (for plot), to be saved to file named filename.
+	'''create two map plots of variables var1/2, longitudes lons, latitudes lats
+	titles 1/2 (for plot), to be saved to file named filename.
 	sic is a 2d array of sea ice concentration (binary mask?)
 	kwargs are for pcolormesh (eg. vmin, vmax, cmap, etc.)
+	note: hardcoding some kwargs because of limitations
+	can fix later w/dictionaries
 	'''
 	matplotlib.rcParams.update(matplotlib.rcParamsDefault)
 	proj=ccrs.NorthPolarStereo(central_longitude=-45)
@@ -59,7 +61,7 @@ def plot_two_maps(var1, var2, lons, lats, title1, title2, filename, sic, cmap1='
 
 
 
-	fig = plt.figure(dpi=200)
+	fig = plt.figure(dpi=200,figsize=(8,4))
 	ax1 = fig.add_subplot(1, 2, 1, projection=proj)
 	ax2 = fig.add_subplot(1, 2, 2, projection=proj)
 	ax1.set_extent([-180, 179.9, 45, 90], ccrs.PlateCarree())
@@ -69,8 +71,9 @@ def plot_two_maps(var1, var2, lons, lats, title1, title2, filename, sic, cmap1='
 	ax1.pcolormesh(lons,lats,sic*0.3, transform=proj_coord, shading='flat', cmap="Greys",vmin=0,vmax=1, label='SIC >= 0.5')
 	ax2.pcolormesh(lons,lats,sic*0.3, transform=proj_coord, shading='flat', cmap="Greys",vmin=0,vmax=1, label='SIC >= 0.5')
 
-	pcm1 = ax.pcolormesh(lons,lats,var1,transform=proj_coord,shading='flat', cmap=cmap, **kwargs) # using flat shading avoids artefacts
-	pcm2 = ax.pcolormesh(lons,lats,var2,transform=proj_coord,shading='flat', cmap=cmap2, **kwargs) # using flat shading avoids artefacts
+	# HARDCODING VMIN/MAX FOR NOW
+	pcm1 = ax1.pcolormesh(lons,lats,var1,transform=proj_coord,shading='flat', cmap=cmap1, vmax=0.6, **kwargs) # using flat shading avoids artefacts
+	pcm2 = ax2.pcolormesh(lons,lats,var2,transform=proj_coord,shading='flat', cmap=cmap2, vmin=300, **kwargs) # using flat shading avoids artefacts
 
 	ax1.coastlines(zorder=3)
 	ax1.gridlines(draw_labels=False,
@@ -83,14 +86,15 @@ def plot_two_maps(var1, var2, lons, lats, title1, title2, filename, sic, cmap1='
 
 	ax1.set_title(title1)
 	ax2.set_title(title2)
-	fig.colorbar(pcm1,ax=ax1)
-	fig.colorbar(pcm2,ax=ax2)
+	fig.colorbar(pcm1,fraction=0.046,pad=0.04,ax=ax1)
+	fig.colorbar(pcm2,fraction=0.046,pad=0.04,ax=ax2)
 
 	# need to manually add legend, apparently
 	sic_legend_patch = matplotlib.patches.Rectangle((0, 0), 1, 1, facecolor="#CECECE")
 	labels = ['SIC >= 0.5']
 	ax1.legend([sic_legend_patch], labels)#,
              #  loc='lower left')#, bbox_to_anchor=(0.025, -0.1), fancybox=True)
+	plt.tight_layout()
 	plt.savefig(filename)
 
 
@@ -179,8 +183,8 @@ MAKE_UNCERT_CORREL_PLOTS = False# plot comparison plots of the uncertainties
 MAKE_SNOW_DEPTH_DENS_PLOTS = False 
 MAKE_1D_HIST_PLOTS = False
 MAKE_BOX_PLOTS = False
-MAKE_PERCENT_PLOTS = False
-MAKE_MAP_SUBPLOTS = True
+MAKE_PERCENT_PLOTS = True 
+MAKE_MAP_SUBPLOTS = False
 # estimate based on retrieval in Petty et al 2020
 
 # monthday='2018-11'
@@ -727,8 +731,8 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		var2 = r_s
 		var2[sea_ice_thickness < 0] = np.nan
 
-		title1 = 'NESOSIM-MCMC snow depth for {} (m)'.format(monthday)
-		title2 = 'NESOSIM-MCMC snow density for {} (m)'.format(monthday)
+		title1 = 'NESOSIM-MCMC snow\ndepth for {} (m)'.format(monthday)
+		title2 = 'NESOSIM-MCMC snow\ndensity for {} (kg/m$^3$)'.format(monthday)
 
 		filename = '{}snow_depth_dens_subplot_map_{}_{}.png'.format(fig_path,data_flag,monthday)
 
