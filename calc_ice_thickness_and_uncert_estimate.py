@@ -182,8 +182,8 @@ MAKE_SIT_CORREL_PLOTS = False# plot nesosim-mcmc and regridded is2 product sit
 MAKE_UNCERT_CORREL_PLOTS = False# plot comparison plots of the uncertainties
 MAKE_SNOW_DEPTH_DENS_PLOTS = False 
 MAKE_1D_HIST_PLOTS = False
-MAKE_BOX_PLOTS = False
-MAKE_PERCENT_PLOTS = True 
+MAKE_BOX_PLOTS = True
+MAKE_PERCENT_PLOTS = False 
 MAKE_MAP_SUBPLOTS = False
 # estimate based on retrieval in Petty et al 2020
 
@@ -220,6 +220,7 @@ val_dict['hs_default'] = []
 val_dict['rs_default'] = []
 val_dict['rs'] = []
 val_dict['ers'] = []
+val_dict['snow_percent'] = []
 
 for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
@@ -689,6 +690,8 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		r_s_default[lto] = np.nan
 		r_s[lto] = np.nan
 		e_r_s[lto] = np.nan
+		uncert_ratio_0 = 100*random_uncert_snow_only / uncert_previous
+		uncert_ratio_0[lto] = np.nan
 
 		# accumulate in dictionary
 		val_dict['month'].append(monthday)
@@ -702,6 +705,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		val_dict['rs_default'].append(r_s_default.flatten())
 		val_dict['rs'].append(r_s.flatten())
 		val_dict['ers'].append(e_r_s.flatten())
+		val_dict['snow_percent'].append(uncert_ratio_0.flatten())
 
 
 	if MAKE_PERCENT_PLOTS:
@@ -937,3 +941,20 @@ if MAKE_BOX_PLOTS:
 	fig.suptitle('Monthly snow spatial distributions')
 	plt.tight_layout()
 	plt.savefig('{}snow_depth_dens_subplots_violin_{}.png'.format(fig_path, data_flag))
+
+
+	# plot a single violin
+
+	ehs_percent
+	df1 = pd.DataFrame(np.array(val_dict['snow_percent']).transpose(),columns=val_dict['month'])
+	df1 = df1.stack().to_frame().reset_index()
+
+
+	df1.columns = ['idx','Month','value']
+
+	plt.figure(dpi=200)
+	sns.violinplot(data=df1,x='Month',y='value', palette='Blues', split=True, order=val_dict['month'], inner='quartile',cut=0) 
+
+	plt.ylabel('Uncertainty as percent of total (%)')
+	plt.title('Snow uncertainty contribution to ice thickness uncertainty (%)')
+	plt.savefig('{}snow_uncert_percent_violin_{}.png'.format(fig_path, data_flag))
