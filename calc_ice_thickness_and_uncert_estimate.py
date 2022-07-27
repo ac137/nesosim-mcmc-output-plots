@@ -169,7 +169,11 @@ def plot_single_hist(data, title, filename, xlabel, ylabel, bins=20, **kwargs):
 
 	matplotlib.rcParams.update(matplotlib.rcParamsDefault)
 	plt.figure(dpi=200)
-	plt.hist(data, bins=bins, **kwargs)
+	h = plt.hist(data, bins=bins, **kwargs)
+	# get largest histogram mode
+	hist_mode = h[1][np.argmax(h[0])]
+	# add largest mode
+	plt.text(0.1, 0.9, 'Mode: {}'.format(hist_mode),transform=plt.gca().transAxes)
 	plt.title(title)
 	plt.ylabel(ylabel)
 	plt.xlabel(xlabel)
