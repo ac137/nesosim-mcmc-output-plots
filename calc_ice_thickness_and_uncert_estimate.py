@@ -179,9 +179,9 @@ def plot_single_hist(data, title, filename, xlabel, ylabel, bins=20, **kwargs):
 # which plots to make (to avoid excessive re-running)
 MAKE_MAP_PLOTS = False# plot maps of uncertainty for the month
 MAKE_SIT_CORREL_PLOTS = False# plot nesosim-mcmc and regridded is2 product sit
-MAKE_UNCERT_CORREL_PLOTS = True# plot comparison plots of the uncertainties
+MAKE_UNCERT_CORREL_PLOTS = False# plot comparison plots of the uncertainties
 MAKE_SNOW_DEPTH_DENS_PLOTS = False 
-MAKE_1D_HIST_PLOTS = False
+MAKE_1D_HIST_PLOTS = True #plot 1d histogram plots
 MAKE_BOX_PLOTS = False
 MAKE_PERCENT_PLOTS = False 
 MAKE_MAP_SUBPLOTS = False
@@ -521,7 +521,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
 
 		# uncertainty only from snow
-		x, y = e_h_s.values, e_h_s_previous
+		x, y = e_h_s, e_h_s_previous
 		title = 'Snow depth uncertainty comparison for {} (m)'.format(monthday)
 		xlabel = 'MCMC snow depth uncert'
 		ylabel = 'P2020 snow depth uncert'
@@ -655,6 +655,18 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		ylabel = 'Count'
 
 		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)#np.linspace(0,1,20))
+
+
+		var = e_h_s_previous
+		var[sea_ice_thickness < 0] = np.nan
+		title = 'NESOSIM-P2020 snow depth uncert. distribution for {} (m)'.format(monthday)
+		filename = '{}snow_depth_uncert_p2020_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+
+		xlabel = 'Snow depth uncert (m)'
+		ylabel = 'Count'
+
+		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)#np.linspace(0,1,20))
+
 
 
 		var = sea_ice_thickness # sit
