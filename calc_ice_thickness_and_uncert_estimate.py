@@ -172,8 +172,12 @@ def plot_single_hist(data, title, filename, xlabel, ylabel, bins=20, **kwargs):
 	h = plt.hist(data, bins=bins, **kwargs)
 	# get largest histogram mode
 	hist_mode = h[1][np.argmax(h[0])]
-	# add largest mode
+	hist_mean = np.nanmean(data.flatten())
+	# add largest mode (not formatted, just for reference)
 	plt.text(0.1, 0.9, 'Mode: {}'.format(hist_mode),transform=plt.gca().transAxes)
+	# add mean
+	plt.text(0.1, 0.8, 'Mean: {}'.format(hist_mean),transform=plt.gca().transAxes)
+	plt.title(title)
 	plt.title(title)
 	plt.ylabel(ylabel)
 	plt.xlabel(xlabel)
