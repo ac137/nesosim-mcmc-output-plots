@@ -945,7 +945,6 @@ if MAKE_BOX_PLOTS:
 
 	# plot a single violin
 
-	ehs_percent
 	df1 = pd.DataFrame(np.array(val_dict['snow_percent']).transpose(),columns=val_dict['month'])
 	df1 = df1.stack().to_frame().reset_index()
 
