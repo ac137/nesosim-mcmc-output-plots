@@ -205,11 +205,11 @@ MAKE_MAP_SUBPLOTS = False
 
 
 # data_flag_list = ['oib_averaged', 'oib_detailed']
-date_list = ['2018-11', '2019-01', '2019-03']
+#date_list = ['2018-11', '2019-01', '2019-03']
 
 data_flag_list = ['oib_detailed']
 #date_list = ['2018-11', '2019-01']
-# date_list = ['2019-03']
+date_list = ['2019-03']
 
 # big for loop? iterate over data_flag and monthday
 # data_flag is no longer a constant I guess
@@ -814,10 +814,10 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		lons = nesosim_data['longitude'] # same lat and lon used everywhere 
 		lats = nesosim_data['latitude']
 		title = 'Snow-only percent NESOSIM-MCMC uncertainty {}'.format(monthday)
-		filename = '{}mcmc_snow_only_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday,vmax=100)
+		filename = '{}mcmc_snow_only_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
 
-		plot_map(var, lons, lats, title, filename, ice_mask_idx)
+		plot_map(var, lons, lats, title, filename, ice_mask_idx,vmax=15)
 
 
 		# fractional uncert
@@ -828,10 +828,10 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		lons = nesosim_data['longitude'] # same lat and lon used everywhere 
 		lats = nesosim_data['latitude']
 		title = 'Snow uncertainty contribution to total percent uncertainty {}'.format(monthday)
-		filename = '{}snow_only_percent_over_is2_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday,vmax=100)
+		filename = '{}snow_only_percent_over_is2_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
 
-		plot_map(var, lons, lats, title, filename, ice_mask_idx)
+		plot_map(var, lons, lats, title, filename, ice_mask_idx,vmax=15)
 
 
 
