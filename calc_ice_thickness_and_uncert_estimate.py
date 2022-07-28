@@ -189,9 +189,9 @@ MAKE_MAP_PLOTS = False# plot maps of uncertainty for the month
 MAKE_SIT_CORREL_PLOTS = False# plot nesosim-mcmc and regridded is2 product sit
 MAKE_UNCERT_CORREL_PLOTS = False# plot comparison plots of the uncertainties
 MAKE_SNOW_DEPTH_DENS_PLOTS = False 
-MAKE_1D_HIST_PLOTS = True #plot 1d histogram plots
+MAKE_1D_HIST_PLOTS = False #plot 1d histogram plots
 MAKE_BOX_PLOTS = False
-MAKE_PERCENT_PLOTS = False 
+MAKE_PERCENT_PLOTS = True 
 MAKE_MAP_SUBPLOTS = False
 # estimate based on retrieval in Petty et al 2020
 
@@ -784,7 +784,56 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		lats = nesosim_data['latitude']
 		title = 'Snow uncertainty contribution to total uncertainty (%) for {}'.format(monthday)
 		filename = '{}snow_over_p2020_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+
 		plot_map(var, lons, lats, title, filename, ice_mask_idx)#,vmax=20)
+
+		# working on this now
+
+		# icesat-2 percent uncertainty (total)
+		percent_uncert_is2 = 100*sit_uncert_is2.values/sit_is2.values
+		# percent uncertainty due to snow only
+		percent_uncert_mcmc_snow_only = 100*random_uncert_snow_only / sea_ice_thickness
+
+		# make plots of both of these
+		var = percent_uncert_is2 # sit value difference
+
+		# mask out ice
+		var[sea_ice_thickness < 0] = np.nan
+		lons = nesosim_data['longitude'] # same lat and lon used everywhere 
+		lats = nesosim_data['latitude']
+		title = 'IS2 percent uncertainty {}'.format(monthday)
+		filename = '{}is2_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+
+		plot_map(var, lons, lats, title, filename, ice_mask_idx)
+
+
+		var = percent_uncert_mcmc_snow_only # sit value difference
+
+		# mask out ice
+		var[sea_ice_thickness < 0] = np.nan
+		lons = nesosim_data['longitude'] # same lat and lon used everywhere 
+		lats = nesosim_data['latitude']
+		title = 'Snow contribution to NESOSIM-MCMC SIT percent uncertainty {}'.format(monthday)
+		filename = '{}mcmc_snow_only_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+
+
+		plot_map(var, lons, lats, title, filename, ice_mask_idx)
+
+
+		# fractional uncert
+		var = 100*percent_uncert_mcmc_snow_only/percent_uncert_is2 # sit value difference
+
+		# mask out ice
+		var[sea_ice_thickness < 0] = np.nan
+		lons = nesosim_data['longitude'] # same lat and lon used everywhere 
+		lats = nesosim_data['latitude']
+		title = 'Snow uncertainty contribution to total percent uncertainty {}'.format(monthday)
+		filename = '{}snow_only_percent_over_is2_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+
+
+		plot_map(var, lons, lats, title, filename, ice_mask_idx)
+
+
 
 	if MAKE_MAP_SUBPLOTS:
 
