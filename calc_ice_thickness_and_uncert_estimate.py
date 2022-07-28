@@ -723,6 +723,17 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
 		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)
 
+
+		var = uncert_previous
+		var[sea_ice_thickness < 0] = np.nan
+		title = 'MCMC-P2020 thickness uncert {} (m)'.format(monthday)
+		filename = '{}mcmc_p2020_sit_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+
+		xlabel = 'SIT uncert (m)'
+		ylabel = 'Count'
+
+		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)
+
 	if MAKE_BOX_PLOTS:
 		# collect values
 
