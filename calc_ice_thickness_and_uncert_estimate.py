@@ -702,6 +702,27 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		ylabel = 'Count'
 		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)#, bins=np.linspace(0,1,20))
 
+
+		var = sit_is2.values
+		var[sea_ice_thickness < 0] = np.nan
+		title = 'IS2SITMOGR4 thickness {} (m)'.format(monthday)
+		filename = '{}is2_sit_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+
+		xlabel = 'SIT (m)'
+		ylabel = 'Count'
+
+		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)
+
+		var = sit_uncert_is2.values
+		var[sea_ice_thickness < 0] = np.nan
+		title = 'IS2SITMOGR4 thickness uncert {} (m)'.format(monthday)
+		filename = '{}is2_sit_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+
+		xlabel = 'SIT uncert (m)'
+		ylabel = 'Count'
+
+		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)
+
 	if MAKE_BOX_PLOTS:
 		# collect values
 
