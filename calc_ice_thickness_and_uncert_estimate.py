@@ -189,9 +189,9 @@ MAKE_MAP_PLOTS = False# plot maps of uncertainty for the month
 MAKE_SIT_CORREL_PLOTS = False# plot nesosim-mcmc and regridded is2 product sit
 MAKE_UNCERT_CORREL_PLOTS = False# plot comparison plots of the uncertainties
 MAKE_SNOW_DEPTH_DENS_PLOTS = False 
-MAKE_1D_HIST_PLOTS = False #plot 1d histogram plots
+MAKE_1D_HIST_PLOTS = True #plot 1d histogram plots
 MAKE_BOX_PLOTS = False
-MAKE_PERCENT_PLOTS = True 
+MAKE_PERCENT_PLOTS = False 
 MAKE_MAP_SUBPLOTS = False
 # estimate based on retrieval in Petty et al 2020
 
@@ -733,6 +733,46 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		ylabel = 'Count'
 
 		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)
+
+
+		percent_uncert_is2 = 100*sit_uncert_is2.values/sit_is2.values
+
+
+		var = percent_uncert_is2
+		var[sea_ice_thickness < 0] = np.nan
+		title = 'IS2SITMOGR4 percent uncert {} (m)'.format(monthday)
+		filename = '{}is2_sit_percent_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+
+		xlabel = 'SIT uncert (m)'
+		ylabel = 'Count'
+
+		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)
+		# percent uncertainty due to snow only
+
+		percent_uncert_mcmc_snow_only = 100*random_uncert_snow_only / sea_ice_thickness
+
+		var = percent_uncert_mcmc_snow_only
+		var[sea_ice_thickness < 0] = np.nan
+		title = 'Snow-only percent SIT uncert {} (m)'.format(monthday)
+		filename = '{}mcmc_snow_only_sit_percent_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+
+		xlabel = 'SIT uncert (m)'
+		ylabel = 'Count'
+
+		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)
+
+
+		var = 100*percent_uncert_mcmc_snow_only/percent_uncert_is2
+		var[sea_ice_thickness < 0] = np.nan
+		title = 'Snow-only SIT uncertainty as percent of IS2SITMOGR4 uncertainty {} (m)'.format(monthday)
+		filename = '{}mcmc_snow_only_is2_sit_contribution_percent_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+
+		xlabel = 'SIT uncert (m)'
+		ylabel = 'Count'
+
+		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)
+
+
 
 	if MAKE_BOX_PLOTS:
 		# collect values
