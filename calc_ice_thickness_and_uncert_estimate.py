@@ -813,8 +813,8 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		var[sea_ice_thickness < 0] = np.nan
 		lons = nesosim_data['longitude'] # same lat and lon used everywhere 
 		lats = nesosim_data['latitude']
-		title = 'Snow contribution to NESOSIM-MCMC SIT percent uncertainty {}'.format(monthday)
-		filename = '{}mcmc_snow_only_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+		title = 'Snow-only percent NESOSIM-MCMC uncertainty {}'.format(monthday)
+		filename = '{}mcmc_snow_only_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday,vmax=100)
 
 
 		plot_map(var, lons, lats, title, filename, ice_mask_idx)
@@ -828,7 +828,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		lons = nesosim_data['longitude'] # same lat and lon used everywhere 
 		lats = nesosim_data['latitude']
 		title = 'Snow uncertainty contribution to total percent uncertainty {}'.format(monthday)
-		filename = '{}snow_only_percent_over_is2_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}snow_only_percent_over_is2_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday,vmax=100)
 
 
 		plot_map(var, lons, lats, title, filename, ice_mask_idx)
