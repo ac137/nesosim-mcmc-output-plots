@@ -189,8 +189,8 @@ MAKE_MAP_PLOTS = False# plot maps of uncertainty for the month
 MAKE_SIT_CORREL_PLOTS = False# plot nesosim-mcmc and regridded is2 product sit
 MAKE_UNCERT_CORREL_PLOTS = False# plot comparison plots of the uncertainties
 MAKE_SNOW_DEPTH_DENS_PLOTS = False 
-MAKE_1D_HIST_PLOTS = True#plot 1d histogram plots
-MAKE_BOX_PLOTS = False
+MAKE_1D_HIST_PLOTS = False#plot 1d histogram plots
+MAKE_BOX_PLOTS = True
 MAKE_PERCENT_PLOTS =False 
 MAKE_MAP_SUBPLOTS = False
 # estimate based on retrieval in Petty et al 2020
@@ -229,6 +229,7 @@ val_dict['rs_default'] = []
 val_dict['rs'] = []
 val_dict['ers'] = []
 val_dict['snow_percent'] = []
+val_dict['sit_default'] = []
 
 for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
@@ -300,6 +301,8 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 	# default snow depth
 	h_s_default = nesosim_default_monthly['snow_depth'].mean(axis=0).values
 	r_s_default = nesosim_default_monthly['snow_density'].mean(axis=0).values
+
+	ice_thickness_default = h_f*r_w*inverse_r_w_minus_r_i + h_s_default*(r_s_default-r_w)*inverse_r_w_minus_r_i
 
 	# create a binary sic mask
 	SIC_THRESHOLD = 0.5
@@ -795,6 +798,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		e_r_s[lto] = np.nan
 		uncert_ratio_0 = 100*random_uncert_snow_only / uncert_previous
 		uncert_ratio_0[lto] = np.nan
+		ice_thickness_default[lto] = np.nan
 
 		# accumulate in dictionary
 		val_dict['month'].append(monthday)
@@ -809,6 +813,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		val_dict['rs'].append(r_s.flatten())
 		val_dict['ers'].append(e_r_s.flatten())
 		val_dict['snow_percent'].append(uncert_ratio_0.flatten())
+		val_dict['sit_default'].append(ice_thickness_default.flatten())
 
 
 	if MAKE_PERCENT_PLOTS:
@@ -921,6 +926,31 @@ if MAKE_BOX_PLOTS:
 	plt.ylabel('Sea ice thickness (m)')
 	plt.title('Monthly sea ice thickness spatial distribution')
 	plt.savefig('{}sit_mcmc_plot_violin_{}.png'.format(fig_path, data_flag))
+
+
+	############## violin plot: mcmc vs default nesosim (prior) sit
+
+	
+	df1 = pd.DataFrame(np.array(val_dict['sit_mcmc']).transpose(),columns=val_dict['month'])
+	df1 = df1.stack()
+	df1.rename('MCMC',inplace=True) #is the renaming redundant?
+
+	df2 = pd.DataFrame(np.array(val_dict['sit_default']).transpose(),columns=val_dict['month'])
+	df2 = df2.stack()
+	df2.rename('Prior',inplace=True)
+
+	df = pd.concat([df1, df2],keys=['MCMC','Prior'], axis=0).reset_index()
+
+	df.columns = ['Product','idx','Month','value']
+
+	plt.figure(dpi=200)
+	sns.violinplot(data=df,x='Month',y='value',hue='Product',palette='crest',split=True,order=val_dict['month'],inner='quartile',cut=0) 
+
+	#plt.xticks(ticks=range(len(val_dict['month'])), labels=val_dict['month'])
+	plt.legend(loc='upper center')
+	plt.ylabel('Sea ice thickness (m)')
+	plt.title('Monthly sea ice thickness spatial distribution')
+	plt.savefig('{}sit_mcmc_vs_prior_plot_violin_{}.png'.format(fig_path, data_flag))
 
 
 	############# error sit violin
