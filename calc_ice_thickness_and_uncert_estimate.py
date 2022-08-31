@@ -189,9 +189,9 @@ MAKE_MAP_PLOTS = False# plot maps of uncertainty for the month
 MAKE_SIT_CORREL_PLOTS = False# plot nesosim-mcmc and regridded is2 product sit
 MAKE_UNCERT_CORREL_PLOTS = False# plot comparison plots of the uncertainties
 MAKE_SNOW_DEPTH_DENS_PLOTS = False 
-MAKE_1D_HIST_PLOTS = True #plot 1d histogram plots
+MAKE_1D_HIST_PLOTS = True#plot 1d histogram plots
 MAKE_BOX_PLOTS = False
-MAKE_PERCENT_PLOTS = False 
+MAKE_PERCENT_PLOTS =False 
 MAKE_MAP_SUBPLOTS = False
 # estimate based on retrieval in Petty et al 2020
 
@@ -205,11 +205,11 @@ MAKE_MAP_SUBPLOTS = False
 
 
 # data_flag_list = ['oib_averaged', 'oib_detailed']
-#date_list = ['2018-11', '2019-01', '2019-03']
+date_list = ['2018-11', '2019-01', '2019-03']
 
 data_flag_list = ['oib_detailed']
 #date_list = ['2018-11', '2019-01']
-date_list = ['2019-03']
+#date_list = ['2019-03']
 
 # big for loop? iterate over data_flag and monthday
 # data_flag is no longer a constant I guess
@@ -743,10 +743,10 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		title = 'IS2SITMOGR4 percent uncert {} (m)'.format(monthday)
 		filename = '{}is2_sit_percent_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
 
-		xlabel = 'SIT uncert (m)'
+		xlabel = 'SIT uncert (%)'
 		ylabel = 'Count'
 
-		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)
+		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=np.arange(0,105,5))
 		# percent uncertainty due to snow only
 
 		percent_uncert_mcmc_snow_only = 100*random_uncert_snow_only / sea_ice_thickness
@@ -756,10 +756,10 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		title = 'Snow-only percent SIT uncert {} (m)'.format(monthday)
 		filename = '{}mcmc_snow_only_sit_percent_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
 
-		xlabel = 'SIT uncert (m)'
+		xlabel = 'SIT uncert (%)'
 		ylabel = 'Count'
 
-		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)
+		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=np.linspace(0,22,30))
 
 
 		var = 100*percent_uncert_mcmc_snow_only/percent_uncert_is2
@@ -767,10 +767,10 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		title = 'Snow-only SIT uncertainty as percent of IS2SITMOGR4 uncertainty {} (m)'.format(monthday)
 		filename = '{}mcmc_snow_only_is2_sit_contribution_percent_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
 
-		xlabel = 'SIT uncert (m)'
+		xlabel = 'SIT uncert (%)'
 		ylabel = 'Count'
 
-		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=20)
+		plot_single_hist(var.flatten(), title, filename, xlabel, ylabel, bins=np.linspace(0,42,30))
 
 
 
@@ -871,7 +871,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		filename = '{}snow_only_percent_over_is2_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
 
 
-		plot_map(var, lons, lats, title, filename, ice_mask_idx,vmax=15)
+		plot_map(var, lons, lats, title, filename, ice_mask_idx,vmax=30)
 
 
 
