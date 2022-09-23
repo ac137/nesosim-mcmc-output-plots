@@ -1155,7 +1155,7 @@ if MAKE_BOX_PLOTS:
 #	df1[df1>250] = np.nan
 	# df2: dataframe with nesosim uncertainty percent
 	snow_perc = np.array(val_dict['snow_percent'])
-	snow_perc[snow_perc>150] = np.nan
+	snow_perc[snow_perc>20] = np.nan
 	df2 = pd.DataFrame(snow_perc.transpose(),columns=val_dict['month'])
 	df2 = df2.stack()
 	df2.rename('MCMC',inplace=True)	
@@ -1174,12 +1174,12 @@ if MAKE_BOX_PLOTS:
 
 
 	# depends on above
-	df1 = pd.DataFrame(sit_perc.transpose(),columns=val_dict['month'])
+	df1 = pd.DataFrame(snow_perc.transpose(),columns=val_dict['month'])
 	df1 = df1.stack().to_frame().reset_index()
 
 	df1.columns = ['idx','Month','value']
 
-	df2 = pd.DataFrame(snow_perc.transpose(),columns=val_dict['month'])
+	df2 = pd.DataFrame(sit_perc.transpose(),columns=val_dict['month'])
 	df2 = df2.stack().to_frame().reset_index()
 
 
@@ -1193,6 +1193,7 @@ if MAKE_BOX_PLOTS:
 	ax1.set_ylabel('MCMC uncertainty from snow')
 	ax2.set_ylabel('IS2 uncertainty from snow')
 	fig.suptitle('Monthly snow uncertainty contribution as percent of ice thickness spatial distribution')
+	plt.tight_layout()
 	plt.savefig('{}sit_uncert_violin_snow_contrib_mcmc_vs_is2_2axes{}.png'.format(fig_path, data_flag))
 
 
