@@ -811,10 +811,10 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		uncert_ratio_0[lto] = np.nan
 		 # mask out less than zero values for default ice thickness
 		ice_thickness_default[ice_thickness_default < 0] = np.nan
-		unc_is2_snow = unc_is2_snow[0] # select 0 to avoid indexing issues from different shape
+		unc_is2_snow = unc_is2_snow[0].values # select 0 to avoid indexing issues from different shape
 		unc_is2_snow[lto] = np.nan
-		unc_is2_snow_percent = unc_is2_snow_percent[0]
-		unc_is2_snow_percent = np.nan
+		unc_is2_snow_percent = unc_is2_snow_percent[0].values
+		unc_is2_snow_percent[lto] = np.nan
 
 		# accumulate in dictionary
 		val_dict['month'].append(monthday)
@@ -1145,12 +1145,18 @@ if MAKE_BOX_PLOTS:
 
 
 	# double violin: mcmc snow uncert contribution vs. is2 snow uncert contribution
-
-	df1 = pd.DataFrame(np.array(val_dict['sit_uncert_snow_percent_is2']).transpose(),columns=val_dict['month'])
+	# df1: dataframe with icesat2 uncertainty percent
+	sit_perc = np.array(val_dict['sit_uncert_snow_percent_is2'])
+	sit_perc[sit_perc>150] = np.nan
+	df1 = pd.DataFrame(sit_perc.transpose(),columns=val_dict['month'])
 	df1 = df1.stack()
 	df1.rename('IS2SITMOGR4',inplace=True) #is the renaming redundant?
-
-	df2 = pd.DataFrame(np.array(val_dict['snow_percent']).transpose(),columns=val_dict['month'])
+#	df1.where(df1>250, np.nan, inplace=True)
+#	df1[df1>250] = np.nan
+	# df2: dataframe with nesosim uncertainty percent
+	snow_perc = np.array(val_dict['snow_percent'])
+	snow_perc[snow_perc>150] = np.nan
+	df2 = pd.DataFrame(snow_perc.transpose(),columns=val_dict['month'])
 	df2 = df2.stack()
 	df2.rename('MCMC',inplace=True)	
 
