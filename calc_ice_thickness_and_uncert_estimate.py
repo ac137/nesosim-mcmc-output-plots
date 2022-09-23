@@ -1169,8 +1169,31 @@ if MAKE_BOX_PLOTS:
 
 	plt.legend(loc='lower right')
 	plt.ylabel('Percent')
-	plt.title('Monthly snow uncertainty as percent of ice thickness spatial distribution')
+	plt.title('Monthly snow uncertainty contribution as percent of ice thickness spatial distribution')
 	plt.savefig('{}sit_uncert_violin_snow_contrib_mcmc_vs_is2{}.png'.format(fig_path, data_flag))
+
+
+	# depends on above
+	df1 = pd.DataFrame(sit_perc.transpose(),columns=val_dict['month'])
+	df1 = df1.stack().to_frame().reset_index()
+
+	df1.columns = ['idx','Month','value']
+
+	df2 = pd.DataFrame(snow_perc.transpose(),columns=val_dict['month'])
+	df2 = df2.stack().to_frame().reset_index()
+
+
+	df2.columns = ['idx','Month','value']
+
+	fig, (ax1, ax2) = plt.subplots(1, 2,dpi=200,figsize=(8,4))
+	sns.violinplot(data=df1,x='Month',y='value', palette='Blues', split=True, order=val_dict['month'], inner='quartile',cut=0,ax=ax1)
+	sns.violinplot(data=df2,x='Month',y='value', palette='Blues', split=True, order=val_dict['month'], inner='quartile',cut=0,ax=ax2) 
+ 
+
+	ax1.set_ylabel('MCMC uncertainty from snow')
+	ax2.set_ylabel('IS2 uncertainty from snow')
+	fig.suptitle('Monthly snow uncertainty contribution as percent of ice thickness spatial distribution')
+	plt.savefig('{}sit_uncert_violin_snow_contrib_mcmc_vs_is2_2axes{}.png'.format(fig_path, data_flag))
 
 
 	# plot a single violin
