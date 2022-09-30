@@ -1141,8 +1141,8 @@ if MAKE_BOX_PLOTS:
 	ax2.legend(loc='lower right')
 	ax1.set_ylabel('Snow depth (m)')
 	ax2.set_ylabel('Snow density (kg/m$^3$)')
-	ax1.text(0.1, 0.9, 'a)', horizontalalignment='center',verticalalignment='center', transform=ax1.transAxes,weight='bold')
-	ax2.text(0.1, 0.9, 'b)', horizontalalignment='center',verticalalignment='center', transform=ax2.transAxes,weight='bold')
+	ax1.text(0.05, 0.95, 'a)', horizontalalignment='center',verticalalignment='center', transform=ax1.transAxes,weight='bold')
+	ax2.text(0.05, 0.95, 'b)', horizontalalignment='center',verticalalignment='center', transform=ax2.transAxes,weight='bold')
 
 	fig.suptitle('Monthly snow spatial distributions')
 	plt.tight_layout()
