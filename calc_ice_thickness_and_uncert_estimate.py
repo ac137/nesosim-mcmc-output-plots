@@ -88,6 +88,8 @@ def plot_two_maps(var1, var2, lons, lats, title1, title2, filename, sic, cmap1='
 	ax2.set_title(title2)
 	fig.colorbar(pcm1,fraction=0.046,pad=0.04,ax=ax1)
 	fig.colorbar(pcm2,fraction=0.046,pad=0.04,ax=ax2)
+	ax1.text(0.05, 0.95, 'a)', horizontalalignment='center',verticalalignment='center', transform=ax1.transAxes,weight='bold')
+	ax2.text(0.05, 0.95, 'b)', horizontalalignment='center',verticalalignment='center', transform=ax2.transAxes,weight='bold')
 
 	# need to manually add legend, apparently
 	sic_legend_patch = matplotlib.patches.Rectangle((0, 0), 1, 1, facecolor="#CECECE")
@@ -190,9 +192,9 @@ MAKE_SIT_CORREL_PLOTS = False# plot nesosim-mcmc and regridded is2 product sit
 MAKE_UNCERT_CORREL_PLOTS = False# plot comparison plots of the uncertainties
 MAKE_SNOW_DEPTH_DENS_PLOTS = False 
 MAKE_1D_HIST_PLOTS = False#plot 1d histogram plots
-MAKE_BOX_PLOTS = True
+MAKE_BOX_PLOTS = False
 MAKE_PERCENT_PLOTS =False 
-MAKE_MAP_SUBPLOTS = False
+MAKE_MAP_SUBPLOTS = True
 # estimate based on retrieval in Petty et al 2020
 
 # monthday='2018-11'
