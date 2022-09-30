@@ -1082,28 +1082,28 @@ if MAKE_BOX_PLOTS:
 
 	
 	####### snow depth + dens uncertainty double figure plot
-	# df1 = pd.DataFrame(np.array(val_dict['ehs']).transpose(),columns=val_dict['month'])
-	# df1 = df1.stack().to_frame().reset_index()
+	df1 = pd.DataFrame(np.array(val_dict['ehs']).transpose(),columns=val_dict['month'])
+	df1 = df1.stack().to_frame().reset_index()
 
-	# df1.columns = ['idx','Month','value']
+	df1.columns = ['idx','Month','value']
 
-	# df2 = pd.DataFrame(np.array(val_dict['ers']).transpose(),columns=val_dict['month'])
-	# df2 = df2.stack().to_frame().reset_index()
+	df2 = pd.DataFrame(np.array(val_dict['ers']).transpose(),columns=val_dict['month'])
+	df2 = df2.stack().to_frame().reset_index()
 
 
-	# df2.columns = ['idx','Month','value']
+	df2.columns = ['idx','Month','value']
 
-	# fig, (ax1, ax2) = plt.subplots(1, 2,dpi=200,figsize=(8,4))
-	# sns.violinplot(data=df1,x='Month',y='value', palette='Blues', split=True, order=val_dict['month'], inner='quartile',cut=0,ax=ax1)
-	# sns.violinplot(data=df2,x='Month',y='value', palette='YlOrBr', split=True, order=val_dict['month'], inner='quartile',cut=0,ax=ax2) 
+	fig, (ax1, ax2) = plt.subplots(1, 2,dpi=200,figsize=(8,4))
+	sns.violinplot(data=df1,x='Month',y='value', palette='Blues', split=True, order=val_dict['month'], inner='quartile',cut=0,ax=ax1)
+	sns.violinplot(data=df2,x='Month',y='value', palette='YlOrBr', split=True, order=val_dict['month'], inner='quartile',cut=0,ax=ax2) 
  
 
-	# ax1.set_ylabel('Snow depth uncert (m)')
-	# ax2.set_ylabel('Snow density uncert (kg/m$^3$)')
-	# fig.suptitle('Monthly snow uncertainty spatial distributions')
+	ax1.set_ylabel('Snow depth uncertainty (m)')
+	ax2.set_ylabel('Snow density uncertainty (kg/m$^3$)')
+	fig.suptitle('Monthly snow uncertainty spatial distributions')
 
 
-	# plt.savefig('{}snow_depth_dens_uncert_subplots_violin_{}.png'.format(fig_path, data_flag))
+	plt.savefig('{}snow_depth_dens_uncert_subplots_violin_{}.png'.format(fig_path, data_flag))
 
 
 	# ############## snow depth and snow density double figure plot
@@ -1218,9 +1218,9 @@ if MAKE_BOX_PLOTS:
 	sns.violinplot(data=df2,x='Month',y='value', palette='Blues', split=True, order=val_dict['month'], inner='quartile',cut=0,ax=ax2) 
  
 
-	ax1.set_ylabel('MCMC uncertainty from snow (m)')
-	ax2.set_ylabel('IS2 uncertainty from snow (m)')
-	fig.suptitle('Monthly snow uncertainty contribution to ice thickness')
+	ax1.set_ylabel('MCMC SIT uncertainty from snow (m)')
+	ax2.set_ylabel('IS2SITMOGR4 uncertainty from snow (m)')
+	fig.suptitle('Monthly snow uncertainty contribution to ice thickness uncertainty')
 	plt.tight_layout()
 	plt.savefig('{}sit_uncert_violin_snow_contrib_mcmc_vs_is2_2axes_m_{}.png'.format(fig_path, data_flag))
 
