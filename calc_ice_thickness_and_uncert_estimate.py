@@ -1100,6 +1100,8 @@ if MAKE_BOX_PLOTS:
 
 	ax1.set_ylabel('Snow depth uncertainty (m)')
 	ax2.set_ylabel('Snow density uncertainty (kg/m$^3$)')
+	ax1.text(0.05, 0.95, 'a)', horizontalalignment='center',verticalalignment='center', transform=ax1.transAxes,weight='bold')
+	ax2.text(0.05, 0.95, 'b)', horizontalalignment='center',verticalalignment='center', transform=ax2.transAxes,weight='bold')
 	fig.suptitle('Monthly snow uncertainty spatial distributions')
 
 
