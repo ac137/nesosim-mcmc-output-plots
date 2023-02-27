@@ -13,7 +13,7 @@ VARNAME = 'snow_depth'
 
 # TRYING JUST A SINGLE YEAR FOR NOW
 current_year=2000
-N_ITER_BS = 10 # number of bootstrap iterations
+N_ITER_BS = 1000 # number of bootstrap iterations
 LOOP_ITER = 10
 
 # load jra
