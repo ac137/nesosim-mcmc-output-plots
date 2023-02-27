@@ -360,27 +360,27 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		# sea ice thickness from NESOSIM-mcmc
 		var = sea_ice_thickness 
 		title = 'Sea ice thickness for {} (m)'.format(monthday)
-		filename = '{}sea_ice_thickness_estimate_{}_{}.png'.format(fig_path,data_flag,monthday)
+		filename = '{}sea_ice_thickness_estimate_{}_{}.pdf'.format(fig_path,data_flag,monthday)
 		plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=0, vmax=5, cmap='Purples')
 
 
 		# sea ice thickness unertainty from NESOSIM-mcmc using uncertainty formula
 		var = random_uncert
 		title = 'Sea ice thickness uncertainty for {} (m)'.format(monthday)
-		filename = '{}sea_ice_thickness_uncert_{}_{}.png'.format(fig_path,data_flag, monthday)
+		filename = '{}sea_ice_thickness_uncert_{}_{}.pdf'.format(fig_path,data_flag, monthday)
 		plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=0, vmax=0.7, cmap='Greens')
 
 		# 'snow only' sea ice thickness uncertainty (exclude contribution from other terms)
 		var = random_uncert_snow_only
 		title = 'Sea ice thickness uncertainty (from snow only) for {} (m)'.format(monthday)
-		filename = '{}sea_ice_thickness_uncert_snow_only_{}_{}.png'.format(fig_path,data_flag, monthday)
+		filename = '{}sea_ice_thickness_uncert_snow_only_{}_{}.pdf'.format(fig_path,data_flag, monthday)
 		plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=0, vmax=0.7)
 
 
 		# uncertainty estimate using values from P2020 paper for snow uncert
 		var = uncert_previous
 		title = 'Sea ice thickness uncertainty (P2020 estimate) for {} (m)'.format(monthday)
-		filename = '{}sea_ice_thickness_uncert_p2020_{}_{}.png'.format(fig_path,data_flag, monthday)
+		filename = '{}sea_ice_thickness_uncert_p2020_{}_{}.pdf'.format(fig_path,data_flag, monthday)
 		plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=0, vmax=0.7)
 
 
@@ -428,7 +428,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		horiz_label = 'SIT (m)'
 		vert_label = 'Number of grid cells'
 		
-		filename = '{}hist_is2_vs_mcmc_sit_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}hist_is2_vs_mcmc_sit_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 
 		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
 		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
@@ -439,7 +439,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		lons = nesosim_data['longitude']
 		lats = nesosim_data['latitude']
 		title = 'IS2SITMOGR4 sea ice thickness for {} (m)'.format(monthday)
-		filename = '{}mcmc-is2-sit-map_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}mcmc-is2-sit-map_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 		plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=0, vmax=5)
 
 		# difference between is2 sit and nesosim-mcmc sit
@@ -447,7 +447,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		lons = nesosim_data['longitude'] # same lat and lon used everywhere 
 		lats = nesosim_data['latitude']
 		title = 'NESOSIM-MCMC - IS2 SIT difference for {} (m)'.format(monthday)
-		filename = '{}mcmc-is2-diff-map_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}mcmc-is2-diff-map_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 		plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=-4, vmax=4, cmap='RdBu')
 
 
@@ -456,7 +456,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		lons = nesosim_data['longitude'] 
 		lats = nesosim_data['latitude']
 		title = 'NESOSIM-MCMC - IS2 SIT uncert difference for {} (m)'.format(monthday)
-		filename = '{}mcmc-is2-uncert-diff-map_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}mcmc-is2-uncert-diff-map_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 
 		plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=-1,vmax=1,cmap='RdBu')
 
@@ -466,7 +466,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		lons = nesosim_data['longitude'] 
 		lats = nesosim_data['latitude']
 		title = 'IS2 - P2020 NESOSIM-MCMC SIT uncert difference for {} (m)'.format(monthday)
-		filename = '{}mcmc-p2020-is2-uncert-diff-map_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}mcmc-p2020-is2-uncert-diff-map_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 
 		plot_map(var, lons, lats, title, filename, ice_mask_idx, vmin=-1,vmax=1,cmap='RdBu')	
 
@@ -478,7 +478,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		ylabel = 'NESOSIM-MCMC SIT uncert (m)'
 		horiz_label = 'SIT uncert (m)'
 		vert_label = 'Number of grid cells'		
-		filename = '{}hist_is2_vs_mcmc_sit_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}hist_is2_vs_mcmc_sit_uncert_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 
 		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, range=[[0,1.2],[0,1.2]])
 		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename,binrange=[0,1.2],color='g')#,xlim=(0,1.2),ylim=(0,1.2))
@@ -493,7 +493,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		ylabel = 'NESOSIM-MCMC SIT uncert P2020 (m)'
 		horiz_label = 'SIT uncert (m)'
 		vert_label = 'Number of grid cells'
-		filename = '{}hist_is2_vs_mcmc_p2020_sit_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}hist_is2_vs_mcmc_p2020_sit_uncert_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 
 		# plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename, range=[[0,1.2],[0,1.2]])
 		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename,binrange=[0,1.2])#,xlim=(0,1.2),ylim=(0,1.2))
@@ -507,7 +507,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		xlabel = 'NESOSIM-MCMC snow depth (m)'
 		ylabel = 'NESOSIM-MCMC SIT (m)'
 		
-		filename = '{}hist_hs_vs_mcmc_sit_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}hist_hs_vs_mcmc_sit_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 
 		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
 
@@ -519,7 +519,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		xlabel = 'NESOSIM-MCMC snow depth (m)'
 		ylabel = 'IS2 ATL20 freeboard (m)'
 		
-		filename = '{}hist_hs_vs_freeboard_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}hist_hs_vs_freeboard_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename,color='c')
 		
 
@@ -539,7 +539,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		ylabel = 'Total uncertainty'
 		horiz_label = 'SIT uncert (m)'
 		vert_label = 'Number of grid cells'
-		filename = '{}hist_ensemble_vs_total_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}hist_ensemble_vs_total_uncert_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 
 		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
 		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
@@ -551,7 +551,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		ylabel = 'P2020 snow depth uncert'
 		horiz_label = 'Snow depth uncert (m)'
 		vert_label = 'Number of grid cells'
-		filename = '{}hist_mcmc_vs_p2020_snow_depth_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}hist_mcmc_vs_p2020_snow_depth_uncert_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
 
 
@@ -562,7 +562,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		ylabel = 'Snow-only uncertainty'
 		horiz_label = 'SIT uncert (m)'
 		vert_label = 'Number of grid cells'
-		filename = '{}hist_ensemble_vs_snow_only_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}hist_ensemble_vs_snow_only_uncert_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 
 		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
 		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
@@ -574,7 +574,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		ylabel = 'Snow-only uncertainty'
 		horiz_label = 'SIT uncert (m)'
 		vert_label = 'Number of grid cells'
-		filename = '{}hist_snow_only_vs_total_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}hist_snow_only_vs_total_uncert_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 
 		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
 		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
@@ -586,7 +586,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		ylabel = 'Ensemble uncertainty'
 		horiz_label = 'SIT uncert (m)'
 		vert_label = 'Number of grid cells'
-		filename = '{}hist_p2020_vs_ensemble_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}hist_p2020_vs_ensemble_uncert_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 
 		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
 		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
@@ -598,7 +598,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		ylabel = 'Total uncertainty'
 		horiz_label = 'SIT uncert (m)'
 		vert_label = 'Number of grid cells'
-		filename = '{}hist_p2020_vs_total_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}hist_p2020_vs_total_uncert_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 
 		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
 		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
@@ -611,7 +611,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		ylabel = 'Snow-only uncertainty'
 		horiz_label = 'SIT uncert (m)'
 		vert_label = 'Number of grid cells'
-		filename = '{}hist_p2020_vs_snow_only_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}hist_p2020_vs_snow_only_uncert_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 
 		plot_nan_masked_hist(x, y, title, xlabel, ylabel, filename)
 		# plot_nan_masked_hist_1d(x, y, title, xlabel, ylabel, filename, horiz_label, vert_label)
@@ -630,25 +630,25 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		# mask out where sit is unphysical
 		var[sea_ice_thickness < 0] = np.nan
 		title = 'NESOSIM-MCMC snow depth for {} (m)'.format(monthday)
-		filename = '{}snow_depth_map_{}_{}.png'.format(fig_path,data_flag,monthday)
+		filename = '{}snow_depth_map_{}_{}.pdf'.format(fig_path,data_flag,monthday)
 		plot_map(var, lons, lats, title, filename, ice_mask_idx,vmax=0.6)
 
 		var = r_s
 		var[sea_ice_thickness < 0] = np.nan
 		title = 'NESOSIM-MCMC snow density for {} (kg/m^3)'.format(monthday)
-		filename = '{}snow_density_map_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}snow_density_map_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 		plot_map(var, lons, lats, title, filename, ice_mask_idx,vmin=300,cmap='YlOrBr')
 		
 		var = e_h_s
 		var[sea_ice_thickness < 0] = np.nan
 		title = 'NESOSIM-MCMC snow depth uncert. for {} (m)'.format(monthday)
-		filename = '{}snow_depth_unc_map_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}snow_depth_unc_map_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 		plot_map(var, lons, lats, title, filename, ice_mask_idx)
 		
 		var = e_r_s
 		var[sea_ice_thickness < 0] = np.nan
 		title = 'NESOSIM-MCMC snow density uncert. for {} (kg/m^3)'.format(monthday)
-		filename = '{}snow_density_unc_map_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}snow_density_unc_map_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 		plot_map(var, lons, lats, title, filename, ice_mask_idx)
 
 	if MAKE_1D_HIST_PLOTS:
@@ -661,7 +661,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		var[sea_ice_thickness < 0] = np.nan
 
 		title = 'NESOSIM-MCMC snow depth distribution for {}'.format(monthday)
-		filename = '{}snow_depth_distribution_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+		filename = '{}snow_depth_distribution_1d_{}_{}.pdf'.format(fig_path,data_flag,monthday)
 
 		# should I normalize these??
 		xlabel = 'Snow depth (m)'
@@ -673,7 +673,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		var = e_h_s
 		var[sea_ice_thickness < 0] = np.nan
 		title = 'NESOSIM-MCMC snow depth uncert. distribution for {} (m)'.format(monthday)
-		filename = '{}snow_depth_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+		filename = '{}snow_depth_uncert_dist_1d_{}_{}.pdf'.format(fig_path,data_flag,monthday)
 
 		xlabel = 'Snow depth uncert (m)'
 		ylabel = 'Count'
@@ -684,7 +684,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		var = e_h_s_previous
 		var[sea_ice_thickness < 0] = np.nan
 		title = 'NESOSIM-P2020 snow depth uncert. distribution for {} (m)'.format(monthday)
-		filename = '{}snow_depth_uncert_p2020_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+		filename = '{}snow_depth_uncert_p2020_dist_1d_{}_{}.pdf'.format(fig_path,data_flag,monthday)
 
 		xlabel = 'Snow depth uncert (m)'
 		ylabel = 'Count'
@@ -698,7 +698,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		var[sea_ice_thickness < 0] = np.nan
 
 		title = 'NESOSIM-MCMC SIT distribution for {}'.format(monthday)
-		filename = '{}sit_distribution_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+		filename = '{}sit_distribution_1d_{}_{}.pdf'.format(fig_path,data_flag,monthday)
 
 		# should I normalize these??
 		xlabel = 'Sea ice thickness (m)'
@@ -712,7 +712,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		var[sea_ice_thickness < 0] = np.nan
 		title = 'NESOSIM-MCMC SIT uncert distribution for {}'.format(monthday)
 
-		filename = '{}sit_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+		filename = '{}sit_uncert_dist_1d_{}_{}.pdf'.format(fig_path,data_flag,monthday)
 
 		xlabel = 'Sea ice thickness uncert (m)'
 		ylabel = 'Count'
@@ -722,7 +722,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		var = sit_is2.values
 		var[sea_ice_thickness < 0] = np.nan
 		title = 'IS2SITMOGR4 thickness {} (m)'.format(monthday)
-		filename = '{}is2_sit_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+		filename = '{}is2_sit_dist_1d_{}_{}.pdf'.format(fig_path,data_flag,monthday)
 
 		xlabel = 'SIT (m)'
 		ylabel = 'Count'
@@ -732,7 +732,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		var = sit_uncert_is2.values
 		var[sea_ice_thickness < 0] = np.nan
 		title = 'IS2SITMOGR4 thickness uncert {} (m)'.format(monthday)
-		filename = '{}is2_sit_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+		filename = '{}is2_sit_uncert_dist_1d_{}_{}.pdf'.format(fig_path,data_flag,monthday)
 
 		xlabel = 'SIT uncert (m)'
 		ylabel = 'Count'
@@ -743,7 +743,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		var = uncert_previous
 		var[sea_ice_thickness < 0] = np.nan
 		title = 'MCMC-P2020 thickness uncert {} (m)'.format(monthday)
-		filename = '{}mcmc_p2020_sit_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+		filename = '{}mcmc_p2020_sit_uncert_dist_1d_{}_{}.pdf'.format(fig_path,data_flag,monthday)
 
 		xlabel = 'SIT uncert (m)'
 		ylabel = 'Count'
@@ -757,7 +757,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		var = percent_uncert_is2
 		var[sea_ice_thickness < 0] = np.nan
 		title = 'IS2SITMOGR4 percent uncert {} (m)'.format(monthday)
-		filename = '{}is2_sit_percent_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+		filename = '{}is2_sit_percent_uncert_dist_1d_{}_{}.pdf'.format(fig_path,data_flag,monthday)
 
 		xlabel = 'SIT uncert (%)'
 		ylabel = 'Count'
@@ -770,7 +770,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		var = percent_uncert_mcmc_snow_only
 		var[sea_ice_thickness < 0] = np.nan
 		title = 'Snow-only percent SIT uncert {} (m)'.format(monthday)
-		filename = '{}mcmc_snow_only_sit_percent_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+		filename = '{}mcmc_snow_only_sit_percent_uncert_dist_1d_{}_{}.pdf'.format(fig_path,data_flag,monthday)
 
 		xlabel = 'SIT uncert (%)'
 		ylabel = 'Count'
@@ -781,7 +781,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		var = 100*percent_uncert_mcmc_snow_only/percent_uncert_is2
 		var[sea_ice_thickness < 0] = np.nan
 		title = 'Snow-only SIT uncertainty as percent of IS2SITMOGR4 uncertainty {} (m)'.format(monthday)
-		filename = '{}mcmc_snow_only_is2_sit_contribution_percent_uncert_dist_1d_{}_{}.png'.format(fig_path,data_flag,monthday)
+		filename = '{}mcmc_snow_only_is2_sit_contribution_percent_uncert_dist_1d_{}_{}.pdf'.format(fig_path,data_flag,monthday)
 
 		xlabel = 'SIT uncert (%)'
 		ylabel = 'Count'
@@ -851,7 +851,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		lons = nesosim_data['longitude'] # same lat and lon used everywhere 
 		lats = nesosim_data['latitude']
 		title = 'Snow uncertainty contribution to total uncertainty (%) for {}'.format(monthday)
-		filename = '{}snow_over_p2020_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}snow_over_p2020_percent_uncert_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 
 		plot_map(var, lons, lats, title, filename, ice_mask_idx)#,vmax=20)
 
@@ -870,7 +870,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		lons = nesosim_data['longitude'] # same lat and lon used everywhere 
 		lats = nesosim_data['latitude']
 		title = 'IS2 percent uncertainty {}'.format(monthday)
-		filename = '{}is2_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}is2_percent_uncert_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 
 		plot_map(var, lons, lats, title, filename, ice_mask_idx)
 
@@ -882,7 +882,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		lons = nesosim_data['longitude'] # same lat and lon used everywhere 
 		lats = nesosim_data['latitude']
 		title = 'Snow-only percent NESOSIM-MCMC uncertainty {}'.format(monthday)
-		filename = '{}mcmc_snow_only_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}mcmc_snow_only_percent_uncert_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 
 
 		plot_map(var, lons, lats, title, filename, ice_mask_idx,vmax=15)
@@ -896,7 +896,7 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 		lons = nesosim_data['longitude'] # same lat and lon used everywhere 
 		lats = nesosim_data['latitude']
 		title = 'Snow uncertainty contribution to total percent uncertainty {}'.format(monthday)
-		filename = '{}snow_only_percent_over_is2_percent_uncert_{}_{}.png'.format(fig_path, data_flag, monthday)
+		filename = '{}snow_only_percent_over_is2_percent_uncert_{}_{}.pdf'.format(fig_path, data_flag, monthday)
 
 
 		plot_map(var, lons, lats, title, filename, ice_mask_idx,vmax=30)
@@ -914,11 +914,13 @@ for data_flag, monthday in itertools.product(data_flag_list, date_list):
 
 		var2 = r_s
 		var2[sea_ice_thickness < 0] = np.nan
+		# adding to make nan mask consistent?
+		var1[np.isnan(var2)] = np.nan
 
 		title1 = 'NESOSIM-MCMC snow\ndepth for {} (m)'.format(monthday)
 		title2 = 'NESOSIM-MCMC snow\ndensity for {} (kg/m$^3$)'.format(monthday)
 
-		filename = '{}snow_depth_dens_subplot_map_{}_{}.png'.format(fig_path,data_flag,monthday)
+		filename = '{}snow_depth_dens_subplot_map_{}_{}.pdf'.format(fig_path,data_flag,monthday)
 
 		plot_two_maps(var1, var2, lons, lats, title1, title2, filename, ice_mask_idx, cmap1='Blues',cmap2='YlOrBr')
 
@@ -948,7 +950,7 @@ if MAKE_BOX_PLOTS:
 	plt.legend(loc='upper center')
 	plt.ylabel('Sea ice thickness (m)')
 	plt.title('Monthly sea ice thickness spatial distribution')
-	plt.savefig('{}sit_mcmc_plot_violin_{}.png'.format(fig_path, data_flag))
+	plt.savefig('{}sit_mcmc_plot_violin_{}.pdf'.format(fig_path, data_flag))
 
 
 	############## violin plot: mcmc vs default nesosim (prior) sit
@@ -973,7 +975,7 @@ if MAKE_BOX_PLOTS:
 	plt.legend(loc='upper center')
 	plt.ylabel('Sea ice thickness (m)')
 	plt.title('Monthly sea ice thickness spatial distribution')
-	plt.savefig('{}sit_mcmc_vs_prior_plot_violin_{}.png'.format(fig_path, data_flag))
+	plt.savefig('{}sit_mcmc_vs_prior_plot_violin_{}.pdf'.format(fig_path, data_flag))
 
 
 	############# error sit violin
@@ -1107,7 +1109,7 @@ if MAKE_BOX_PLOTS:
 	fig.suptitle('Monthly snow uncertainty spatial distributions')
 
 
-	plt.savefig('{}snow_depth_dens_uncert_subplots_violin_{}.png'.format(fig_path, data_flag))
+	plt.savefig('{}snow_depth_dens_uncert_subplots_violin_{}.pdf'.format(fig_path, data_flag))
 
 
 	############## snow depth and snow density double figure plot
@@ -1150,7 +1152,7 @@ if MAKE_BOX_PLOTS:
 
 	fig.suptitle('Monthly snow spatial distributions')
 	plt.tight_layout()
-	plt.savefig('{}snow_depth_dens_subplots_violin_{}.png'.format(fig_path, data_flag))
+	plt.savefig('{}snow_depth_dens_subplots_violin_{}.pdf'.format(fig_path, data_flag))
 
 
 
