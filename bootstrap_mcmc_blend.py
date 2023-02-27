@@ -5,7 +5,7 @@ import pandas as pd
 import xarray as xr
 import matplotlib.pyplot as plt
 import os
-import xskillscore as xs
+# import xskillscore as xs
 
 OIB_STATUS = 'detailed'
 EXTRA_FMT = '40_years_final_5k_J5_cscalib_cov'
@@ -13,7 +13,7 @@ VARNAME = 'snow_depth'
 
 # TRYING JUST A SINGLE YEAR FOR NOW
 current_year=2000
-N_ITER_BS = 10
+N_ITER_BS = 10 # number of bootstrap iterations
 LOOP_ITER = 10
 
 # load jra
@@ -39,29 +39,44 @@ data_all = xr.concat(data_list, pd.Index(DATASET_LIST, name='product'))
 # stack the data and reindex! call the iteration number for the ensemble ensemble_number
 stacked_data = data_all.stack(ensemble_number=("iteration_number", "product"))
 
-# dask will complain a lot about this operation. may want to try rechunking this?
-# 'rechunking an array created with open_mfdataset is not recommended'
-stacked_data = stacked_data.reindex(ensemble_number=np.arange(300))
+# # dask will complain a lot about the below operation. may want to try rechunking this?
+# # 'rechunking an array created with open_mfdataset is not recommended'
+# stacked_data = stacked_data.reindex(ensemble_number=np.arange(300))
+# won't reindex because it raises mem errors; instead just try manually doing bootstrap
 
 
-# take just snow depth
+# random integers for bootstrap, 1000x300 array of random integers
+# trying this so that we can make sure there isn't a bias against selections that cause
+# memory errors
+bootstrap_idx_arr = np.loadtxt('rand_int_for_bootstrap.csv',dtype=int)
 
-md_sd = stacked_data[VARNAME]
 
-for i in range(5,LOOP_ITER):
+# take just snow depth (or other var)
+stacked_data_1var = stacked_data[VARNAME]
+
+# multiindex for ensemble members; used to convert from numerical indices
+# to location in multi-reanalysis array for bootstrap sampling
+ensemble_coords = stacked_data['ensemble_number']
+
+# iterate over the number of bootstrap iterations
+for i in range(N_ITER_BS):
 	print('iteration count {}'.format(i))
 
-	# number of bootstrap iterations
-	resamp_1 = xs.resample_iterations(md_sd, N_ITER_BS, 'ensemble_number')
+	# select 300 indices for this iteration from bootstrap-generated list
+	idx_rand300 = bootstrap_idx_arr[i] 
+	# select corresponding coordinates for the array
+	coord_rand300 = ensemble_coords[idx_rand300]
+	# select the 300 random samples from the array using the coordinates
+	selected_data_bs = stacked_data_1var.sel(ensemble_number=coord_rand300)
 
-	# calculate mean and standard dev.
-	mean = resamp_1.mean(dim='ensemble_number')
+	# calculate statistics
+	mean_bs_1iter = selected_data_bs.mean(dim='ensemble_number')
+	sd_bs_1iter = selected_data_bs.std(dim='ensemble_number')
 
-	sd = resamp_1.std(dim='ensemble_number')
-
-
+	print('saving data for iteration {}'.format(i))
 	# save as netcdf
-	mean.to_netcdf('/users/jk/20/acabaj/bootstrap_samples/bootstrap_iter_{}_year_{}_mean_{}_nsamp_{}.nc'.format(N_ITER_BS, current_year, VARNAME, i))
-	sd.to_netcdf('/users/jk/20/acabaj/bootstrap_samples/bootstrap_iter_{}_year_{}_standard_dev_{}_nsamp_{}.nc'.format(N_ITER_BS, current_year, VARNAME, i))
-
+	mean_bs_1iter.to_netcdf('/users/jk/20/acabaj/bootstrap_samples/bootstrap_iter_{}_year_{}_mean_{}_idx_{}.nc'.format(N_ITER_BS, current_year, VARNAME, i))
+	sd_bs_1iter.to_netcdf('/users/jk/20/acabaj/bootstrap_samples/bootstrap_iter_{}_year_{}_standard_dev_{}_idx_{}.nc'.format(N_ITER_BS, current_year, VARNAME, i))
+	print('saved data for iteration {}'.format(i))
+	
 print('completed all iterations')
